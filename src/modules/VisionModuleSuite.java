@@ -14,6 +14,6 @@ public class VisionModuleSuite {
      */
     static {
         ModuleRunner.addMapping(new ImageCaptureSource(
-                "/Users/Danny/Downloads/RealFullField/3.jpg"), new VisionModule1());
+                "/Users/Danny/Downloads/RealFullField/181.jpg"), new VisionModule1());
     }
 }
