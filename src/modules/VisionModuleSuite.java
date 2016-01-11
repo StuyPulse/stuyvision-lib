@@ -1,6 +1,6 @@
 package modules;
 
-import vision.DeviceCaptureSource;
+import vision.ImageCaptureSource;
 import vision.ModuleRunner;
 
 public class VisionModuleSuite {
@@ -13,6 +13,7 @@ public class VisionModuleSuite {
      *   - ImageCaptureSource
      */
     static {
-        ModuleRunner.addMapping(new DeviceCaptureSource(0, 300), new VisionModule1(), new VisionModule2());
+        ModuleRunner.addMapping(new ImageCaptureSource(
+                "/Users/Danny/Downloads/RealFullField/3.jpg"), new VisionModule1());
     }
 }
