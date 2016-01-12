@@ -1,5 +1,6 @@
-#java-vision-gui
+# Stuy-Vision 2016
 
-An interactive GUI for OpenCV image processing vision module development, inspired by [CUAUV](https://github.com/cuauv)'s auv-vision-gui.  
-##Screenshots
-![Example](/screenshots/1.jpg)
+This is our CV project for FRC 2016: Stronghold.
+
+Forked and made using an alumni's project.
+
