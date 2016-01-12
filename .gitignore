@@ -1,5 +1,4 @@
 lib/opencv-*
-src/FIRST_Test_Imgs/
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs

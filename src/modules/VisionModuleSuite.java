@@ -13,7 +13,7 @@ public class VisionModuleSuite {
      *   - ImageCaptureSource
      */
     static {
-        ModuleRunner.addMapping(new ImageCaptureSource(
-                "/Users/Danny/Downloads/RealFullField/181.jpg"), new VisionModule1());
+        String imagePath = VisionModuleSuite.class.getResource("").getPath() + "../../images/0.jpg";
+        ModuleRunner.addMapping(new ImageCaptureSource(imagePath), new VisionModule1());
     }
 }
