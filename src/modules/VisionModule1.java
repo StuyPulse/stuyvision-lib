@@ -52,14 +52,13 @@ public class VisionModule1 extends VisionModule {
 
         // Locate the goals
         Mat drawn = frame.clone();
-        Mat edges = new Mat();
         ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
         Imgproc.findContours(channels.get(3), contour, new Mat() , Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         double largestArea = 0.0;
         RotatedRect largestRect = new RotatedRect();
         for (int i = 0; i < contour.size(); i++) {
-            System.out.println(Imgproc.contourArea(contour.get(i)));
-        	if (Imgproc.contourArea(contour.get(i)) < AREA_THRESHOLD.value()) {
+            double currArea = Imgproc.contourArea(contour.get(i));
+            if (currArea < AREA_THRESHOLD.value()) {
                 continue;
             }
             MatOfPoint2f tmp = new MatOfPoint2f();
@@ -70,8 +69,19 @@ public class VisionModule1 extends VisionModule {
             for (int line = 0; line < 4; line++) {
                 Imgproc.line(drawn, points[line], points[(line + 1) % 4], new Scalar(0, 255, 0));
             }
+            if (currArea > largestArea) {
+                largestRect = r;
+            }
         }
-        app.postImage(channels.get(3), "Filtered HSV", this);
+        Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
+        double[] vector = new double[2];
+        vector[0] = largestRect.center.x - (double)(frame.width() / 2);
+        vector[1] = largestRect.center.y - (double)(frame.height() / 2);
+        Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center, new Scalar(0, 0, 255));
+        if (!anglePrinted) {
+            System.out.println(largestRect.angle);
+            anglePrinted = true;
+        }
         app.postImage(drawn, "Goals!", this);
     }
 }
