@@ -14,8 +14,8 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import gui.Main;
-import vision.DoubleSliderVariable;
-import vision.IntegerSliderVariable;
+import gui.DoubleSliderVariable;
+import gui.IntegerSliderVariable;
 import vision.VisionModule;
 
 public class VisionModule1 extends VisionModule {

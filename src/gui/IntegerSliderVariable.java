@@ -1,11 +1,11 @@
-package vision;
+package gui;
 
-public class DoubleSliderVariable extends SliderVariable {
+public class IntegerSliderVariable extends Variable implements NumberVariable {
 
-    public final double DEFAULT, MIN, MAX;
-    private double val;
+    public final int DEFAULT, MIN, MAX;
+    private int val;
 
-    public DoubleSliderVariable(String label, double defaultVal, double minVal, double maxVal) {
+    public IntegerSliderVariable(String label, int defaultVal, int minVal, int maxVal) {
         super(label);
         this.DEFAULT = defaultVal;
         this.MIN = minVal;
@@ -13,7 +13,7 @@ public class DoubleSliderVariable extends SliderVariable {
         this.val = defaultVal;
     }
 
-    public double value() {
+    public int value() {
         return val;
     }
 
@@ -22,14 +22,14 @@ public class DoubleSliderVariable extends SliderVariable {
         return value();
     }
 
-    public void set(double d) {
-        assert MIN <= d && d <= MAX;
-        val = d;
+    public void set(int n) {
+        assert MIN <= n && n <= MAX;
+        val = n;
     }
 
     @Override
     public void setValue(Number n) {
-        set(n.doubleValue());
+        set(n.intValue());
     }
 
     public void restoreDefault() {

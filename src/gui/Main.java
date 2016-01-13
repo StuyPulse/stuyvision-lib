@@ -17,6 +17,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -27,7 +28,7 @@ import vision.VisionModule;
 public class Main extends Application {
     private TabPane root;
     private Scene scene;
-    private HashMap<String, ControlsController> tabs = new HashMap<String, ControlsController>();
+    private HashMap<Integer, ControlsController> tabs = new HashMap<Integer, ControlsController>();
     private ModuleRunner moduleRunner = new ModuleRunner();
     private HashMap<String, ImageFrame> images = new HashMap<String, ImageFrame>();
 
@@ -45,7 +46,7 @@ public class Main extends Application {
                 final SplitPane moduleContainer = tabLoader.load();
                 ControlsController controlsController = tabLoader.getController();
                 controlsController.setup(module);
-                tabs.put(module.getName(), controlsController);
+                tabs.put(module.hashCode(), controlsController);
                 root.getTabs().add(new Tab(module.getName(), moduleContainer));
             }
             moduleRunner.run(this);
@@ -65,12 +66,13 @@ public class Main extends Application {
     }
 
     public synchronized void postImage(Mat m, String label, VisionModule requester) {
+        String key = requester.hashCode() + label;
         // Convert raw image to PNG
         MatOfByte buffer = new MatOfByte();
         Imgcodecs.imencode(".png", m, buffer);
         Image image = new Image(new ByteArrayInputStream(buffer.toArray()));
         // Check if an ImageFrame already exists
-        ImageFrame existingFrame = images.get(label);
+        ImageFrame existingFrame = images.get(key);
         if (existingFrame == null) {
             VBox container = new VBox();
             container.setAlignment(Pos.CENTER);
@@ -78,9 +80,16 @@ public class Main extends Application {
             Text text = new Text(label);
             text.getStyleClass().add("image-label");
             container.getChildren().addAll(imageView, text);
-            images.put(label, new ImageFrame(imageView, text));
+            images.put(key, new ImageFrame(imageView, text));
             Platform.runLater(() -> {
-                tabs.get(requester.getName()).flowPane.getChildren().add(container);
+                tabs.get(requester.hashCode()).flowPane.getChildren().add(container);
+            });
+            container.setOnMouseClicked((event) -> {
+                if (event.getButton().equals(MouseButton.PRIMARY)) {
+                    if (event.getClickCount() == 2) {
+                        ImageViewer.getInstance().showImage(label, imageView);
+                    }
+                }
             });
         }
         else {

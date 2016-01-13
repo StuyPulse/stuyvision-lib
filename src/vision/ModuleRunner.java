@@ -43,7 +43,10 @@ public class ModuleRunner {
                                     Thread t = new Thread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            long start = System.currentTimeMillis();
                                             module.run(app, frame);
+                                            long duration = System.currentTimeMillis() - start;
+                                            //DebugPrinter.println(module.getName() + ": " + duration + " ms");
                                         }
                                     }, module.getName() + " Thread");
                                     t.setDaemon(true);
@@ -61,7 +64,6 @@ public class ModuleRunner {
                 }
             }
         }, "Module Runner Thread");
-        t.setDaemon(true);
         t.start();
     }
 
