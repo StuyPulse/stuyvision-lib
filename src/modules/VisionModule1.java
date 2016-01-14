@@ -26,6 +26,18 @@ public class VisionModule1 extends VisionModule {
     public IntegerSliderVariable maxS = new IntegerSliderVariable("Max S", 255,  0,  255);
     public IntegerSliderVariable minV = new IntegerSliderVariable("Min V", 53,  0,  255);
     public IntegerSliderVariable maxV = new IntegerSliderVariable("Max V", 255, 0, 255);
+    public IntegerSliderVariable threshBlockSizeH = new IntegerSliderVariable(
+            "Thresh Block SizeH", 5, 1, 8);
+    public IntegerSliderVariable threshConstantH = new IntegerSliderVariable(
+            "Thresh ConstantH", 2, 0, 20);
+    public IntegerSliderVariable threshBlockSizeS = new IntegerSliderVariable(
+            "Thresh Block SizeS", 5, 1, 8);
+    public IntegerSliderVariable threshConstantS = new IntegerSliderVariable(
+            "Thresh ConstantS", 2, 0, 20);
+    public IntegerSliderVariable threshBlockSizeV = new IntegerSliderVariable(
+            "Thresh Block SizeV", 5, 1, 8);
+    public IntegerSliderVariable threshConstantV = new IntegerSliderVariable(
+            "Thresh ConstantV", 2, 0, 20);
     public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 45.0, 0.0, 500.0);
     public boolean anglePrinted = false;
 
@@ -34,7 +46,10 @@ public class VisionModule1 extends VisionModule {
         Mat hsv = new Mat();
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_BGR2HSV);
         ArrayList<Mat> channels = new ArrayList<Mat>();
+        ArrayList<Mat> adaptiveChans = new ArrayList<Mat>();
         Core.split(hsv, channels);
+        Core.split(hsv, adaptiveChans);
+
         Core.inRange(channels.get(0), new Scalar(minH.value()), new Scalar(maxH.value()),
                 channels.get(0));
         Core.inRange(channels.get(1), new Scalar(minS.value()), new Scalar(maxS.value()),
@@ -49,6 +64,24 @@ public class VisionModule1 extends VisionModule {
         Imgproc.erode(channels.get(3), channels.get(3), erodeKernel);
         Imgproc.dilate(channels.get(3), channels.get(3), dilateKernel);
         app.postImage(channels.get(3), "After erode/dilate", this);
+
+        // Adaptive Thresholding
+        Imgproc.adaptiveThreshold(adaptiveChans.get(0), adaptiveChans.get(0),
+                255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
+                2 * threshBlockSizeH.value() + 1, threshConstantH.value());
+        Imgproc.adaptiveThreshold(adaptiveChans.get(1), adaptiveChans.get(1),
+                255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
+                2 * threshBlockSizeS.value() + 1, threshConstantS.value());
+        Imgproc.adaptiveThreshold(adaptiveChans.get(2), adaptiveChans.get(2),
+                255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY,
+                2 * threshBlockSizeV.value() + 1, threshConstantV.value());
+        adaptiveChans.add(new Mat());
+        Core.bitwise_and(adaptiveChans.get(0), adaptiveChans.get(1), adaptiveChans.get(3));
+        Core.bitwise_and(adaptiveChans.get(2), adaptiveChans.get(3), adaptiveChans.get(3));
+        app.postImage(adaptiveChans.get(0), "Adaptive Thresh H", this);
+        app.postImage(adaptiveChans.get(1), "Adaptive Thresh S", this);
+        app.postImage(adaptiveChans.get(2), "Adaptive Thresh V", this);
+        app.postImage(adaptiveChans.get(3), "Adaptive Thresh", this);
 
         // Locate the goals
         Mat drawn = frame.clone();
