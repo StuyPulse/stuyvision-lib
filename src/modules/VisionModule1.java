@@ -22,14 +22,14 @@ import vision.VisionModule;
 public class VisionModule1 extends VisionModule {
     public IntegerSliderVariable minH = new IntegerSliderVariable("Min H", 0,  0,  255);
     public IntegerSliderVariable maxH = new IntegerSliderVariable("Max H", 94,  0,  255);
-    public IntegerSliderVariable minS = new IntegerSliderVariable("Min S", 156, 0, 255);
+    public IntegerSliderVariable minS = new IntegerSliderVariable("Min S", 88, 0, 255);
     public IntegerSliderVariable maxS = new IntegerSliderVariable("Max S", 255,  0,  255);
     public IntegerSliderVariable minV = new IntegerSliderVariable("Min V", 53,  0,  255);
     public IntegerSliderVariable maxV = new IntegerSliderVariable("Max V", 255, 0, 255);
     public IntegerSliderVariable threshBlockSizeH = new IntegerSliderVariable(
-            "Thresh Block SizeH", 84, 10, 100);
+            "Thresh Block SizeH", 78, 10, 100);
     public IntegerSliderVariable threshConstantH = new IntegerSliderVariable(
-            "Thresh ConstantH", 2, 0, 200);
+            "Thresh ConstantH", 0, 0, 200);
     public BooleanVariable useH = new BooleanVariable("Use H?", true);
     public IntegerSliderVariable threshBlockSizeS = new IntegerSliderVariable(
             "Thresh Block SizeS", 50, 10, 100);
@@ -41,7 +41,7 @@ public class VisionModule1 extends VisionModule {
     public IntegerSliderVariable threshConstantV = new IntegerSliderVariable(
             "Thresh ConstantV", 0, 0, 200);
     public BooleanVariable useV = new BooleanVariable("Use V?", true);
-    public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 475.0, 0.0, 1000.0);
+    public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 600.0, 0.0, 1000.0);
     public boolean anglePrinted = false;
     
     class Bundle {
@@ -110,7 +110,7 @@ public class VisionModule1 extends VisionModule {
         Core.bitwise_and(channels.get(0), channels.get(1), channels.get(3));
         Core.bitwise_and(channels.get(2), channels.get(3), channels.get(3));
         Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9));
         Imgproc.erode(channels.get(3), channels.get(3), erodeKernel);
         Imgproc.dilate(channels.get(3), channels.get(3), dilateKernel);
         app.postImage(channels.get(3), "After erode/dilate", this);
@@ -141,7 +141,7 @@ public class VisionModule1 extends VisionModule {
         if (useS.getValue()) Core.bitwise_and(adaptiveChans.get(1), adaptiveChans.get(3), adaptiveChans.get(3));
         if (useV.getValue()) Core.bitwise_and(adaptiveChans.get(2), adaptiveChans.get(3), adaptiveChans.get(3));
         Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(7, 7));
         Imgproc.erode(adaptiveChans.get(3), adaptiveChans.get(3), erodeKernel);
         Imgproc.dilate(adaptiveChans.get(3), adaptiveChans.get(3), dilateKernel);
         app.postImage(adaptiveChans.get(0), "Adaptive Thresh H", this);
@@ -153,6 +153,7 @@ public class VisionModule1 extends VisionModule {
 
     public Object run(Main app, Mat frame) {
         app.postImage(frame, "Camera", this);
-        return adaptiveThresh(app, frame);
+        // return adaptiveThresh(app, frame);
+        return hsvThresholding(app, frame);
     }
 }
