@@ -141,6 +141,10 @@ public class VisionModule1 extends VisionModule {
         if (useH.getValue()) Core.bitwise_and(adaptiveChans.get(0), adaptiveChans.get(3), adaptiveChans.get(3));
         if (useS.getValue()) Core.bitwise_and(adaptiveChans.get(1), adaptiveChans.get(3), adaptiveChans.get(3));
         if (useV.getValue()) Core.bitwise_and(adaptiveChans.get(2), adaptiveChans.get(3), adaptiveChans.get(3));
+        Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
+        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Imgproc.erode(adaptiveChans.get(3), adaptiveChans.get(3), erodeKernel);
+        Imgproc.dilate(adaptiveChans.get(3), adaptiveChans.get(3), dilateKernel);
         app.postImage(adaptiveChans.get(0), "Adaptive Thresh H", this);
         app.postImage(adaptiveChans.get(1), "Adaptive Thresh S", this);
         app.postImage(adaptiveChans.get(2), "Adaptive Thresh V", this);
