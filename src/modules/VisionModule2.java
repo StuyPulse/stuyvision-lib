@@ -23,7 +23,7 @@ public class VisionModule2 extends VisionModule {
     public DoubleSliderVariable dummyDouble = new DoubleSliderVariable("Dummy Double", 10.0, 0.0, 100.0);
     public BooleanVariable dummyBoolean = new BooleanVariable("Dummy Boolean", true);
 
-    public void run(Main app, Mat frame) {
+    public Object run(Main app, Mat frame) {
         app.postImage(frame, "Master", this);
 
         // blur
@@ -60,5 +60,7 @@ public class VisionModule2 extends VisionModule {
         Mat frameCopy = frame.clone();
         Imgproc.drawContours(frameCopy, contours, -1, new Scalar(255, 0, 255), 2);
         app.postImage(frameCopy, "Contours", this);
+
+        return null;
     }
 }
