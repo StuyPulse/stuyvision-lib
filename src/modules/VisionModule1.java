@@ -1,7 +1,6 @@
 package modules;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -18,7 +17,6 @@ import gui.BooleanVariable;
 import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
 import gui.Main;
-import sun.lwawt.macosx.CViewEmbeddedFrame;
 import vision.VisionModule;
 
 public class VisionModule1 extends VisionModule {
@@ -76,6 +74,7 @@ public class VisionModule1 extends VisionModule {
                     Imgproc.line(drawn, points[line], points[(line + 1) % 4], new Scalar(0, 255, 0));
                 }
                 if (currArea > largestArea) {
+                    largestArea = currArea;
                     largestRect = r;
                 }
             }
