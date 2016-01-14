@@ -40,8 +40,17 @@ public class VisionModule1 extends VisionModule {
             "Thresh ConstantV", 2, 0, 20);
     public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 45.0, 0.0, 500.0);
     public boolean anglePrinted = false;
+    
+    class Bundle {
+        ArrayList<MatOfPoint> contours;
+        
+        public Bundle() {
+            contours = new ArrayList<>();
+        }
+    }
 
-    public void run(Main app, Mat frame) {
+    public Object run(Main app, Mat frame) {
+        Bundle bundle = new Bundle();
         app.postImage(frame, "Camera", this);
         Mat hsv = new Mat();
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_BGR2HSV);
@@ -89,11 +98,13 @@ public class VisionModule1 extends VisionModule {
         Imgproc.findContours(channels.get(3), contour, new Mat() , Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         double largestArea = 0.0;
         RotatedRect largestRect = new RotatedRect();
+
         for (int i = 0; i < contour.size(); i++) {
             double currArea = Imgproc.contourArea(contour.get(i));
             if (currArea < AREA_THRESHOLD.value()) {
                 continue;
             }
+            bundle.contours.add(contour.get(i));
             MatOfPoint2f tmp = new MatOfPoint2f();
             contour.get(i).convertTo(tmp, CvType.CV_32FC1);
             RotatedRect r = Imgproc.minAreaRect(tmp);
@@ -116,5 +127,6 @@ public class VisionModule1 extends VisionModule {
             anglePrinted = true;
         }
         app.postImage(drawn, "Goals!", this);
+        return bundle;
     }
 }

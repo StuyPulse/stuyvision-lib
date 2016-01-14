@@ -6,7 +6,7 @@ import gui.Main;
 
 public abstract class VisionModule {
 
-    public abstract void run(Main app, Mat frame);
+    public abstract Object run(Main app, Mat frame);
 
     public String getName() {
         return getClass().getSimpleName();
