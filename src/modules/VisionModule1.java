@@ -20,12 +20,18 @@ import gui.Main;
 import vision.VisionModule;
 
 public class VisionModule1 extends VisionModule {
-    public IntegerSliderVariable minH = new IntegerSliderVariable("Min H", 0,  0,  255);
-    public IntegerSliderVariable maxH = new IntegerSliderVariable("Max H", 94,  0,  255);
-    public IntegerSliderVariable minS = new IntegerSliderVariable("Min S", 88, 0, 255);
-    public IntegerSliderVariable maxS = new IntegerSliderVariable("Max S", 255,  0,  255);
-    public IntegerSliderVariable minV = new IntegerSliderVariable("Min V", 19,  0,  255);
-    public IntegerSliderVariable maxV = new IntegerSliderVariable("Max V", 255, 0, 255);
+    public IntegerSliderVariable minH_GREEN = new IntegerSliderVariable("Min H Green", 0,  0,  255);
+    public IntegerSliderVariable maxH_GREEN = new IntegerSliderVariable("Max H Green", 94,  0,  255);
+    public IntegerSliderVariable minS_GREEN = new IntegerSliderVariable("Min S Green", 88, 0, 255);
+    public IntegerSliderVariable maxS_GREEN = new IntegerSliderVariable("Max S Green", 255,  0,  255);
+    public IntegerSliderVariable minV_GREEN = new IntegerSliderVariable("Min V Green", 19,  0,  255);
+    public IntegerSliderVariable maxV_GREEN = new IntegerSliderVariable("Max V Green", 255, 0, 255);
+    public IntegerSliderVariable minH_GRAY = new IntegerSliderVariable("Min H Gray", 0,  0,  255);
+    public IntegerSliderVariable maxH_GRAY = new IntegerSliderVariable("Max H Gray", 255,  0,  255);
+    public IntegerSliderVariable minS_GRAY = new IntegerSliderVariable("Min S Gray", 17, 0, 255);
+    public IntegerSliderVariable maxS_GRAY = new IntegerSliderVariable("Max S Gray", 118,  0,  255);
+    public IntegerSliderVariable minV_GRAY = new IntegerSliderVariable("Min V Gray", 120,  0,  255);
+    public IntegerSliderVariable maxV_GRAY = new IntegerSliderVariable("Max V Gray", 244, 0, 255);
     public IntegerSliderVariable threshBlockSizeH = new IntegerSliderVariable(
             "Thresh Block SizeH", 78, 10, 100);
     public IntegerSliderVariable threshConstantH = new IntegerSliderVariable(
@@ -104,28 +110,49 @@ public class VisionModule1 extends VisionModule {
     public double[] hsvThresholding(Main app, Mat frame) {
         Mat hsv = new Mat();
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_BGR2HSV);
-        ArrayList<Mat> channels = new ArrayList<Mat>();
+        ArrayList<Mat> greenFilterChannels = new ArrayList<Mat>();
+        ArrayList<Mat> grayFilterChannels = new ArrayList<Mat>();
 
         // Split HSV channels and process each channel
-        Core.split(hsv, channels);
-        Core.inRange(channels.get(0), new Scalar(minH.value()), new Scalar(maxH.value()),
-                channels.get(0));
-        Core.inRange(channels.get(1), new Scalar(minS.value()), new Scalar(maxS.value()),
-                channels.get(1));
-        Core.inRange(channels.get(2), new Scalar(minV.value()), new Scalar(maxV.value()),
-                channels.get(2));
-        channels.add(new Mat());
+        Core.split(hsv, greenFilterChannels);
+        Core.inRange(greenFilterChannels.get(0), new Scalar(minH_GREEN.value()), new Scalar(maxH_GREEN.value()),
+                greenFilterChannels.get(0));
+        Core.inRange(greenFilterChannels.get(1), new Scalar(minS_GREEN.value()), new Scalar(maxS_GREEN.value()),
+                greenFilterChannels.get(1));
+        Core.inRange(greenFilterChannels.get(2), new Scalar(minV_GREEN.value()), new Scalar(maxV_GREEN.value()),
+                greenFilterChannels.get(2));
+        greenFilterChannels.add(new Mat());
+
+        Core.split(hsv, grayFilterChannels);
+        Core.inRange(grayFilterChannels.get(0), new Scalar(minH_GRAY.value()), new Scalar(maxH_GRAY.value()),
+                grayFilterChannels.get(0));
+        Core.inRange(grayFilterChannels.get(1), new Scalar(minS_GRAY.value()), new Scalar(maxS_GRAY.value()),
+                grayFilterChannels.get(1));
+        Core.inRange(grayFilterChannels.get(2), new Scalar(minV_GRAY.value()), new Scalar(maxV_GRAY.value()),
+                grayFilterChannels.get(2));
+        grayFilterChannels.add(new Mat());
 
         // Merge channels and erode dilate to remove noise
-        Core.bitwise_and(channels.get(0), channels.get(1), channels.get(3));
-        Core.bitwise_and(channels.get(2), channels.get(3), channels.get(3));
+        Core.bitwise_and(greenFilterChannels.get(0), greenFilterChannels.get(1), greenFilterChannels.get(3));
+        Core.bitwise_and(greenFilterChannels.get(2), greenFilterChannels.get(3), greenFilterChannels.get(3));
         Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
         Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9));
-        Imgproc.erode(channels.get(3), channels.get(3), erodeKernel);
-        Imgproc.dilate(channels.get(3), channels.get(3), dilateKernel);
-        app.postImage(channels.get(3), "After erode/dilate", this);
+        Imgproc.erode(greenFilterChannels.get(3), greenFilterChannels.get(3), erodeKernel);
+        Imgproc.dilate(greenFilterChannels.get(3), greenFilterChannels.get(3), dilateKernel);
 
-        return getLargestGoal(app, frame, channels);
+        Core.bitwise_and(grayFilterChannels.get(0), grayFilterChannels.get(1), grayFilterChannels.get(3));
+        Core.bitwise_and(grayFilterChannels.get(2), grayFilterChannels.get(3), grayFilterChannels.get(3));
+        Imgproc.erode(grayFilterChannels.get(3), grayFilterChannels.get(3), erodeKernel);
+        Imgproc.dilate(grayFilterChannels.get(3), grayFilterChannels.get(3), dilateKernel);
+
+        app.postImage(greenFilterChannels.get(3), "Green - After erode/dilate", this);
+        app.postImage(grayFilterChannels.get(3), "Gray - After erode/dilate", this);
+
+        // Merge "grayed" reflexite with green reflexite
+        Core.bitwise_or(greenFilterChannels.get(3), grayFilterChannels.get(3), greenFilterChannels.get(3));
+        app.postImage(greenFilterChannels.get(3), "Merged", this);
+
+        return getLargestGoal(app, frame, greenFilterChannels);
     }
 
     public double[] adaptiveThresh(Main app, Mat frame) {
@@ -163,7 +190,7 @@ public class VisionModule1 extends VisionModule {
 
     public Object run(Main app, Mat frame) {
         app.postImage(frame, "Camera", this);
-        return adaptiveThresh(app, frame);
-        // return hsvThresholding(app, frame);
+        // return adaptiveThresh(app, frame);
+        return hsvThresholding(app, frame);
     }
 }
