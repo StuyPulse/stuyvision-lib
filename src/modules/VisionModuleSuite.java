@@ -18,7 +18,8 @@ public class VisionModuleSuite {
         String imageDirectory = VisionModuleSuite.class.getResource("").getPath() + "../../images/";
         File directory = new File(imageDirectory);
         File[] directoryListing = directory.listFiles();
-        for (int i = 0; i < directoryListing.length && i < 2; i++) {
+        for (int i = 0; i < directoryListing.length && i < 8; i++) {
+            if (i == 1 || i == 2) continue;
             ModuleRunner.addMapping(new ImageCaptureSource(imageDirectory + directoryListing[i].getName()), new VisionModule1());
         }
     }

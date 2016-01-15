@@ -24,7 +24,7 @@ public class VisionModule1 extends VisionModule {
     public IntegerSliderVariable maxH = new IntegerSliderVariable("Max H", 94,  0,  255);
     public IntegerSliderVariable minS = new IntegerSliderVariable("Min S", 88, 0, 255);
     public IntegerSliderVariable maxS = new IntegerSliderVariable("Max S", 255,  0,  255);
-    public IntegerSliderVariable minV = new IntegerSliderVariable("Min V", 53,  0,  255);
+    public IntegerSliderVariable minV = new IntegerSliderVariable("Min V", 19,  0,  255);
     public IntegerSliderVariable maxV = new IntegerSliderVariable("Max V", 255, 0, 255);
     public IntegerSliderVariable threshBlockSizeH = new IntegerSliderVariable(
             "Thresh Block SizeH", 78, 10, 100);
@@ -52,8 +52,13 @@ public class VisionModule1 extends VisionModule {
         }
     }
 
+    private boolean aspectRatioThreshold(double height, double width) {
+        double ratio = width / height;
+        return (r1.value() < ratio && ratio < r2.value()) || (1 / r2.value()< ratio && ratio < 1 / r1.value());
+    }
+
     private double[] getLargestGoal(Main app, Mat frame, ArrayList<Mat> channels) {
-        // Locate the goals
+            // Locate the goals
             Mat drawn = frame.clone();
             ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
             Imgproc.findContours(channels.get(3), contour, new Mat() , Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
