@@ -2,7 +2,7 @@ package util;
 
 public class DebugPrinter {
 
-    public static final boolean VERBOSE = true;
+    public static final boolean VERBOSE = false;
 
     public static void println(Object x) {
         if (VERBOSE) {

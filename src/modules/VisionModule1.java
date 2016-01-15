@@ -50,7 +50,6 @@ public class VisionModule1 extends VisionModule {
     public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 600.0, 0.0, 1000.0);
     public DoubleSliderVariable r1 = new DoubleSliderVariable("rat. min", 1.25, 1.0, 3.0);
     public DoubleSliderVariable r2 = new DoubleSliderVariable("rat. max", 2.20, 1.0, 3.0);
-    public boolean anglePrinted = false;
     
     class Bundle {
         ArrayList<MatOfPoint> contours;
@@ -95,14 +94,11 @@ public class VisionModule1 extends VisionModule {
                 }
             }
             Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
-            double[] vector = new double[2];
+            double[] vector = new double[3];
             vector[0] = largestRect.center.x - (double)(frame.width() / 2);
             vector[1] = largestRect.center.y - (double)(frame.height() / 2);
             Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center, new Scalar(0, 0, 255));
-            if (!anglePrinted) {
-                System.out.println(largestRect.angle);
-                anglePrinted = true;
-            }
+            vector[2] = largestRect.angle;
             app.postImage(drawn, "Goals!", this);
             return vector;
     }
@@ -181,10 +177,10 @@ public class VisionModule1 extends VisionModule {
         Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(7, 7));
         Imgproc.erode(adaptiveChans.get(3), adaptiveChans.get(3), erodeKernel);
         Imgproc.dilate(adaptiveChans.get(3), adaptiveChans.get(3), dilateKernel);
-        app.postImage(adaptiveChans.get(0), "Adaptive Thresh H", this);
-        app.postImage(adaptiveChans.get(1), "Adaptive Thresh S", this);
-        app.postImage(adaptiveChans.get(2), "Adaptive Thresh V", this);
-        app.postImage(adaptiveChans.get(3), "Adaptive Thresh", this);
+        // app.postImage(adaptiveChans.get(0), "Adaptive Thresh H", this);
+        // app.postImage(adaptiveChans.get(1), "Adaptive Thresh S", this);
+        // app.postImage(adaptiveChans.get(2), "Adaptive Thresh V", this);
+        // app.postImage(adaptiveChans.get(3), "Adaptive Thresh", this);
         return getLargestGoal(app, frame, adaptiveChans);
     }
 
