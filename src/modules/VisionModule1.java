@@ -48,8 +48,8 @@ public class VisionModule1 extends VisionModule {
             "Thresh ConstantV", 0, 0, 200);
     public BooleanVariable useV = new BooleanVariable("Use V?", true);
     public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 600.0, 0.0, 1000.0);
-    public DoubleSliderVariable r1 = new DoubleSliderVariable("rat. min", 1.25, 1.0, 3.0);
-    public DoubleSliderVariable r2 = new DoubleSliderVariable("rat. max", 2.20, 1.0, 3.0);
+    public DoubleSliderVariable r1 = new DoubleSliderVariable("rat. min", 1.25, 1.0, 5.0);
+    public DoubleSliderVariable r2 = new DoubleSliderVariable("rat. max", 3.00, 1.0, 5.0);
     
     class Bundle {
         ArrayList<MatOfPoint> contours;
