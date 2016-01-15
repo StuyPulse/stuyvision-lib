@@ -42,6 +42,8 @@ public class VisionModule1 extends VisionModule {
             "Thresh ConstantV", 0, 0, 200);
     public BooleanVariable useV = new BooleanVariable("Use V?", true);
     public DoubleSliderVariable AREA_THRESHOLD = new DoubleSliderVariable("AREA THRESH", 600.0, 0.0, 1000.0);
+    public DoubleSliderVariable r1 = new DoubleSliderVariable("rat. min", 1.25, 1.0, 3.0);
+    public DoubleSliderVariable r2 = new DoubleSliderVariable("rat. max", 2.20, 1.0, 3.0);
     public boolean anglePrinted = false;
     
     class Bundle {
@@ -73,6 +75,9 @@ public class VisionModule1 extends VisionModule {
                 MatOfPoint2f tmp = new MatOfPoint2f();
                 contour.get(i).convertTo(tmp, CvType.CV_32FC1);
                 RotatedRect r = Imgproc.minAreaRect(tmp);
+                if (!aspectRatioThreshold(r.size.height, r.size.width)) {
+                    continue;
+                }
                 Point[] points = new Point[4];
                 r.points(points);
                 for (int line = 0; line < 4; line++) {
@@ -158,7 +163,7 @@ public class VisionModule1 extends VisionModule {
 
     public Object run(Main app, Mat frame) {
         app.postImage(frame, "Camera", this);
-        // return adaptiveThresh(app, frame);
-        return hsvThresholding(app, frame);
+        return adaptiveThresh(app, frame);
+        // return hsvThresholding(app, frame);
     }
 }
