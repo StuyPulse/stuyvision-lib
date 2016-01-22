@@ -1,0 +1,44 @@
+<project name="stuy-vision-2016" default="run" basedir=".">
+    <!--
+        Before running for the first time, run the following (but
+        use two dashes):
+        $ sudo update-alternatives -config java
+        $ sudo update-alternatives -config javac
+        and choose Java 8
+
+        jfxrt.jar file came from <JRE_HOME>/lib/ext/jfxrt.jar on a
+        Windows machine
+    -->
+    <property name="opencv"
+        value="${basedir}/lib/opencv-3.0.0/build/bin/opencv-300.jar" />
+    <property name="javafx" value="/usr/lib/jvm/jfxrt.jar" />
+    <property name="junit" value="${basedir}/lib/junit.jar" />
+   
+   <path id="jars">
+        <pathelement path="${opencv}" />
+        <pathelement path="${javafx}" />
+        <pathelement path="${junit}" />
+   </path>
+    
+    <target name="run" depends="compile">
+        <java classname="modules.VisionModuleNoGui"
+            classpathref="jars"
+            failonerror="true"/>
+        
+    </target>
+    
+
+    <target name="compile" depends="init">
+        <javac srcdir="src"
+            destdir="bin"
+            source="1.8"
+            target="1.8"
+            verbose="true"
+            classpathref="jars">
+        </javac>
+    </target>
+ 
+    <target name="init">
+        <mkdir dir="bin" />
+    </target>
+</project>
