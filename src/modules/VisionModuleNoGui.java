@@ -39,7 +39,11 @@ public class VisionModuleNoGui {
     public double AREA_THRESHOLD = 600.0;
     public double r1 = 1.25;
     public double r2 = 3.00;
-    
+
+    public static void main(String[] args) {
+	System.out.println("Hello from modules.VisionModuleNoGui.main");
+    }
+
     private int cameraTest(int iters) {
     	VideoCapture vc = new VideoCapture(0);
     	Mat frame = new Mat();
