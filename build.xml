@@ -9,23 +9,25 @@
         jfxrt.jar file came from <JRE_HOME>/lib/ext/jfxrt.jar on a
         Windows machine
     -->
+    <property name="opencv_home"
+        value="${basedir}/lib/opencv-3.0.0" />
     <property name="opencv"
-        value="${basedir}/lib/opencv-3.0.0/build/bin/opencv-300.jar" />
+        value="${opencv_home}/build/bin/opencv-300.jar" />
     <property name="javafx" value="/usr/lib/jvm/jfxrt.jar" />
     <property name="junit" value="${basedir}/lib/junit.jar" />
    
     <path id="jars">
         <pathelement path="${opencv}" />
         <pathelement path="${javafx}" />
-	<pathelement path="${junit}" />
-	<pathelement path="${basedir}/bin" />
+        <pathelement path="${junit}" />
+        <pathelement path="${basedir}/bin" />
     </path>
     
     <target name="run" depends="compile">
         <java classname="modules.VisionModuleNoGui"
-	    classpathref="jars"
+            classpathref="jars"
             dir="${basedir}/bin"
-            failonerror="true"/>
+            failonerror="true" />
     </target>
     
 

@@ -2,6 +2,10 @@ package modules;
 
 import java.util.ArrayList;
 
+import vision.CaptureSource;
+import vision.DeviceCaptureSource;
+import vision.ImageCaptureSource;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -40,25 +44,40 @@ public class VisionModuleNoGui {
     public double r1 = 1.25;
     public double r2 = 3.00;
 
-    public static void main(String[] args) {
-	System.out.println("Hello from modules.VisionModuleNoGui.main");
+    static {
+        System.load("/home/ubuntu/cv/stuy-vision-2016/lib/opencv-3.0.0/build/lib/libopencv_java300.so");
     }
 
-    private int cameraTest(int iters) {
-    	VideoCapture vc = new VideoCapture(0);
-    	Mat frame = new Mat();
-    	
-    	int total = 0;
-    	for (int i = 0; i < iters; i++) {
-    		long start = System.currentTimeMillis();
-        	vc.read(frame);
-    		hsvThresholding(frame);
-    		long duration = System.currentTimeMillis() - start;
-    		total += (int)duration;
-    	}
-    	return total / iters;
+    public static void main(String[] args) {
+        System.out.println("Hello from modules.VisionModuleNoGui.main");
+        System.out.println("Running VisionModuleNoGui");
+        VisionModuleNoGui vm = new VisionModuleNoGui();
+        double avgTime = vm.filesystemTest("images/11.jpg", 10);
+        System.out.println("Average time: " + avgTime);
     }
-    
+
+    private double cameraTest(int iters) {
+        CaptureSource cs = new DeviceCaptureSource(0);
+        return captureSourceTest(cs, iters);
+    }
+
+    private double filesystemTest(String path, int iters) {
+        CaptureSource cs = new ImageCaptureSource(path);
+        return captureSourceTest(cs, iters);
+    }
+
+    private double captureSourceTest(CaptureSource cs, int iters) {
+        int total = 0;
+        for (int i = 0; i < iters; i++) {
+            Mat frame = new Mat();
+            cs.readFrame(frame);
+            long start = System.currentTimeMillis();
+            hsvThresholding(frame);
+            total += (int) (System.currentTimeMillis() - start);
+        }
+        return total / (double) iters;
+    }
+
 	private boolean aspectRatioThreshold(double height, double width) {
         double ratio = width / height;
         return (r1 < ratio && ratio < r2) || (1 / r2< ratio && ratio < 1 / r1);
