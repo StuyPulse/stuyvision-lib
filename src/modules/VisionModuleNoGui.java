@@ -45,7 +45,8 @@ public class VisionModuleNoGui {
     public double r2 = 3.00;
 
     static {
-        System.load("/home/ubuntu/cv/stuy-vision-2016/lib/opencv-3.0.0/build/lib/libopencv_java300.so");
+        String dir = VisionModuleNoGui.class.getClassLoader().getResource("").getPath();
+        System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
     }
 
     public static void main(String[] args) {
