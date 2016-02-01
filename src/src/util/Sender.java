@@ -8,7 +8,7 @@ import jssc.SerialPortList;
 
 public class Sender {
 	SerialPort mainPort;
-	
+
 	public Sender() {
 		mainPort = initializePort();
 	}
@@ -48,8 +48,6 @@ public class Sender {
 		}
 	}
 
-
-
 	public void sendDoubles(double[] doubles) {
 		byte[] byteArray = new byte[doubles.length * 8];// 8 bytes per double
 		for(int i = 0; i < 8; i++) {
@@ -59,5 +57,19 @@ public class Sender {
 			}
 		}
 		sendData(byteArray);
+	}
+
+	public boolean isEmpty() {
+		/*
+		 * When sending data across, there shouldn't be more than one "frame" of data
+		 * sent. 
+		 * This ensures that more data cannot be sent before it is read.
+		 */
+		try {
+			return (mainPort.getInputBufferBytesCount() == 0);
+		} catch (SerialPortException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
