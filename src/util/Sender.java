@@ -1,4 +1,4 @@
-package src.util;
+package util;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;

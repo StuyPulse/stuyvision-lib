@@ -1,4 +1,4 @@
-package src.util;
+package util;
 
 public class Converter {
 
