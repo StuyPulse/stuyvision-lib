@@ -2,6 +2,8 @@ package modules;
 
 import java.util.ArrayList;
 
+import util.Sender;
+
 import vision.CaptureSource;
 import vision.DeviceCaptureSource;
 import vision.ImageCaptureSource;
@@ -51,10 +53,28 @@ public class VisionModuleNoGui {
 
     public static void main(String[] args) {
         System.out.println("Hello from modules.VisionModuleNoGui.main");
-        System.out.println("Running VisionModuleNoGui");
-        VisionModuleNoGui vm = new VisionModuleNoGui();
-        double avgTime = vm.filesystemTest("images/11.jpg", 10);
-        System.out.println("Average time: " + avgTime);
+        //System.out.println("Running VisionModuleNoGui");
+        //VisionModuleNoGui vm = new VisionModuleNoGui();
+        //double avgTime = vm.filesystemTest("images/11.jpg", 10);
+        //System.out.println("Average time: " + avgTime);
+        
+        Sender sender = new Sender();
+        
+        System.out.println("About to send raw bytes to Tegra");
+        byte[] bytes = new byte[26];
+        for (int i = 0; i < bytes.length; i += 1) {
+            bytes[i] = (byte) (i + 65);
+        }
+        sender.sendData(bytes);
+        System.out.println("Sent bytes [65, 91)");
+
+        System.out.println("About to send doubles");
+        double[] doubles = new double[10];
+        for (int i = 0; i < doubles.length; i += 1) {
+            doubles[i] = ((double) i) * 1.25;
+        }
+        sender.sendDoubles(doubles);
+        System.out.println("Sent ten doubles");
     }
 
     private double cameraTest(int iters) {
