@@ -13,20 +13,15 @@ public class Sender {
 		mainPort = initializePort();
 	}
 
-	public void runTest() {
-		String[] mainPortNames = SerialPortList.getPortNames();
-		if (mainPortNames.length == 0) {
-	    	System.out.println(":(");
-	    }else {
-	    	System.out.println(":D :D :D :D PORTS FOUND! :D :D :D :D");
-			for(int i = 0; i < mainPortNames.length; i++){
-		        System.out.println(mainPortNames[i]);
-		    }
-	    }
-	}
-
 	public SerialPort initializePort() {
-		return new SerialPort((SerialPortList.getPortNames())[0]);//new SerialPort("COM1");
+		String[] ports = SerialPortList.getPortNames();
+		if (ports.length > 0) {
+			return new SerialPort(ports[0]);//new SerialPort("COM1");
+		} else {
+			System.out.println("No ports detected.");
+			System.exit(1);
+			return null;
+		}
 	}
 
 	public void sendData(byte[] bytebuffer) {
