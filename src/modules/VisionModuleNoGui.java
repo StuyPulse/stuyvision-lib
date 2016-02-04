@@ -53,21 +53,50 @@ public class VisionModuleNoGui {
 
     public static void main(String[] args) {
         System.out.println("Hello from modules.VisionModuleNoGui.main");
-        //System.out.println("Running VisionModuleNoGui");
-        //VisionModuleNoGui vm = new VisionModuleNoGui();
-        //double avgTime = vm.filesystemTest("images/11.jpg", 10);
-        //System.out.println("Average time: " + avgTime);
-        
+
+        CaptureSource cs = new DeviceCaptureSource(0);
         Sender sender = new Sender();
-        
+        VisionModuleNoGui vm = new VisionModuleNoGui();
+        //vm.processAndSendIndefinitely(cs, sender, true);
+        vm.printBytesSendTest(sender, 10);
+    }
+
+    public void processAndSendIndefinitely(
+            CaptureSource cs, Sender sender, boolean printInfo) {
+        Mat frame = new Mat();
+        for (int n = 0; n < 10; n++) { // Not indefnitley at the moment
+            cs.readFrame(frame);
+            double[] vectorToGoal = hsvThresholding(frame);
+            if (printInfo) {
+                System.out.print("Sent vector: (");
+                for (int i = 0; i < vectorToGoal.length; i += 1) {
+                    System.out.print(vectorToGoal[i] + ", ");
+                }
+                System.out.println(")");
+            }
+            sender.sendMessage(vectorToGoal);
+        }
+    }
+
+    public double printFilesysteSpeedTest(String path) {
+        System.out.println("Running VisionModuleNoGui");
+        VisionModuleNoGui vm = new VisionModuleNoGui();
+        double avgTime = vm.filesystemTest(path, 10);
+        System.out.println("Average time: " + avgTime);
+        return avgTime;
+    }
+
+    public void printBytesSendTest(Sender sender, int numBytes) {
         System.out.println("About to send raw bytes to Tegra");
-        byte[] bytes = new byte[26];
+        byte[] bytes = new byte[numBytes];
         for (int i = 0; i < bytes.length; i += 1) {
             bytes[i] = (byte) (i + 65);
         }
         sender.sendData(bytes);
-        System.out.println("Sent bytes [65, 91)");
+        System.out.println("Sent " + numBytes + " bytes");
+    }
 
+    public void printDoublesSendTest(Sender sender) {
         System.out.println("About to send doubles");
         double[] doubles = new double[10];
         for (int i = 0; i < doubles.length; i += 1) {
@@ -75,6 +104,11 @@ public class VisionModuleNoGui {
         }
         sender.sendDoubles(doubles);
         System.out.println("Sent ten doubles");
+    }
+
+    public void processAndSend(Mat frame, Sender sender) {
+        double[] vector = hsvThresholding(frame);
+        sender.sendMessage(vector);
     }
 
     private double cameraTest(int iters) {
@@ -99,7 +133,7 @@ public class VisionModuleNoGui {
         return total / (double) iters;
     }
 
-	private boolean aspectRatioThreshold(double height, double width) {
+    private boolean aspectRatioThreshold(double height, double width) {
         double ratio = width / height;
         return (r1 < ratio && ratio < r2) || (1 / r2< ratio && ratio < 1 / r1);
     }

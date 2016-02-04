@@ -54,6 +54,13 @@ public class Sender {
 		sendData(byteArray);
 	}
 
+    public void sendMessage(double[] vector) {
+        byte[] startSignal = {(byte) 255};
+        sendData(startSignal);
+        sendDoubles(vector);
+    }
+
+
 	public boolean isEmpty() {
 		/*
 		 * When sending data across, there shouldn't be more than one "frame" of data
