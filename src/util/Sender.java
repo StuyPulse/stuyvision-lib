@@ -29,6 +29,7 @@ public class Sender {
 			mainPort.openPort();
 			mainPort.setParams(9600, 8, 1, 0);
 			mainPort.writeBytes(bytebuffer);
+			//mainPort.purgePort(SerialPort.PURGE_TXCLEAR);
 			mainPort.closePort();
 		} catch (SerialPortException e) {
 			e.printStackTrace();
@@ -44,14 +45,14 @@ public class Sender {
 	}
 
 	public void sendDoubles(double[] doubles) {
-		byte[] byteArray = new byte[doubles.length * 8];// 8 bytes per double
+		/*byte[] byteArray = new byte[doubles.length * 8];// 8 bytes per double
         for (int i = 0; i < doubles.length; i++) {
 			byte[] convertedDouble = Converter.doubleToBytes(doubles[i]);
 			for(int j = 0; j < convertedDouble.length; j++) {
 				byteArray[(i * 8) + j] = convertedDouble[j];
 			}
-		}
-		sendData(byteArray);
+		}*/
+		sendData(Converter.doublesToBytes(doubles));
 	}
 
     public void sendMessage(double[] vector) {
