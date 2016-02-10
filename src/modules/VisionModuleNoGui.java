@@ -1,5 +1,4 @@
 package modules;
-
 import java.util.ArrayList;
 
 import util.Sender;
@@ -19,6 +18,8 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
+
+import java.util.Arrays;
 
 public class VisionModuleNoGui {
     public int minH_GREEN = 0;
@@ -57,24 +58,19 @@ public class VisionModuleNoGui {
         CaptureSource cs = new DeviceCaptureSource(0);
         Sender sender = new Sender();
         VisionModuleNoGui vm = new VisionModuleNoGui();
-        //vm.processAndSendIndefinitely(cs, sender, true);
-        vm.printBytesSendTest(sender, 10);
+        vm.processAndSendIndefinitely(cs, sender, true);
     }
 
     public void processAndSendIndefinitely(
             CaptureSource cs, Sender sender, boolean printInfo) {
         Mat frame = new Mat();
-        for (int n = 0; n < 10; n++) { // Not indefnitley at the moment
+        for (;;) {
             cs.readFrame(frame);
             double[] vectorToGoal = hsvThresholding(frame);
             if (printInfo) {
-                System.out.print("Sent vector: (");
-                for (int i = 0; i < vectorToGoal.length; i += 1) {
-                    System.out.print(vectorToGoal[i] + ", ");
-                }
-                System.out.println(")");
+                System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
             }
-            sender.sendMessage(vectorToGoal);
+            sender.sendDoubles(vectorToGoal);
         }
     }
 
@@ -108,7 +104,7 @@ public class VisionModuleNoGui {
 
     public void processAndSend(Mat frame, Sender sender) {
         double[] vector = hsvThresholding(frame);
-        sender.sendMessage(vector);
+        sender.sendDoubles(vector);
     }
 
     private double cameraTest(int iters) {

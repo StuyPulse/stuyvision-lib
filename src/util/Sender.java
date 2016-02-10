@@ -16,7 +16,7 @@ public class Sender {
 	public SerialPort initializePort() {
 		String[] ports = SerialPortList.getPortNames();
 		if (ports.length > 0) {
-			return new SerialPort(ports[0]);//new SerialPort("COM1");
+			return new SerialPort(ports[0]);
 		} else {
 			System.out.println("No ports detected.");
 			System.exit(1);
@@ -29,50 +29,13 @@ public class Sender {
 			mainPort.openPort();
 			mainPort.setParams(9600, 8, 1, 0);
 			mainPort.writeBytes(bytebuffer);
-			//mainPort.purgePort(SerialPort.PURGE_TXCLEAR);
 			mainPort.closePort();
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void emptyPortInput() {
-		try {
-			mainPort.readBytes(mainPort.getInputBufferBytesCount());
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void sendDoubles(double[] doubles) {
-		/*byte[] byteArray = new byte[doubles.length * 8];// 8 bytes per double
-        for (int i = 0; i < doubles.length; i++) {
-			byte[] convertedDouble = Converter.doubleToBytes(doubles[i]);
-			for(int j = 0; j < convertedDouble.length; j++) {
-				byteArray[(i * 8) + j] = convertedDouble[j];
-			}
-		}*/
 		sendData(Converter.doublesToBytes(doubles));
-	}
-
-    public void sendMessage(double[] vector) {
-        byte[] startSignal = {(byte) 255};
-        sendData(startSignal);
-        sendDoubles(vector);
-    }
-
-
-	public boolean isEmpty() {
-		/*
-		 * When sending data across, there shouldn't be more than one "frame" of data
-		 * sent. 
-		 * This ensures that more data cannot be sent before it is read.
-		 */
-		try {
-			return (mainPort.getInputBufferBytesCount() == 0);
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		}
-		return false;
 	}
 }

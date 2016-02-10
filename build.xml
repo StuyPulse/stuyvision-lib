@@ -44,6 +44,7 @@
     </target>
  
     <target name="init">
+        <delete dir="bin" />
         <mkdir dir="bin" />
     </target>
 </project>
