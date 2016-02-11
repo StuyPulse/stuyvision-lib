@@ -1,5 +1,4 @@
 package modules;
-import java.util.ArrayList;
 
 import util.Sender;
 
@@ -20,6 +19,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+
 
 public class VisionModuleNoGui {
     public int minH_GREEN = 0;
@@ -134,11 +135,11 @@ public class VisionModuleNoGui {
         return (r1 < ratio && ratio < r2) || (1 / r2< ratio && ratio < 1 / r1);
     }
 
-    private double[] getLargestGoal(Mat frame, ArrayList<Mat> channels) {
+    private double[] getLargestGoal(Mat frame, Mat filteredImage) {
             // Locate the goals
             Mat drawn = frame.clone();
             ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
-            Imgproc.findContours(channels.get(3), contour, new Mat() , Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(filteredImage, contour, new Mat() , Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
             double largestArea = 0.0;
             RotatedRect largestRect = new RotatedRect();
 
@@ -187,7 +188,6 @@ public class VisionModuleNoGui {
                 greenFilterChannels.get(1));
         Core.inRange(greenFilterChannels.get(2), new Scalar(minV_GREEN), new Scalar(maxV_GREEN),
                 greenFilterChannels.get(2));
-        greenFilterChannels.add(new Mat());
 
         Core.split(hsv, grayFilterChannels);
         Core.inRange(grayFilterChannels.get(0), new Scalar(minH_GRAY), new Scalar(maxH_GRAY),
@@ -196,28 +196,31 @@ public class VisionModuleNoGui {
                 grayFilterChannels.get(1));
         Core.inRange(grayFilterChannels.get(2), new Scalar(minV_GRAY), new Scalar(maxV_GRAY),
                 grayFilterChannels.get(2));
-        grayFilterChannels.add(new Mat());
 
         // Merge channels and erode dilate to remove noise
-        Core.bitwise_and(greenFilterChannels.get(0), greenFilterChannels.get(1), greenFilterChannels.get(3));
-        Core.bitwise_and(greenFilterChannels.get(2), greenFilterChannels.get(3), greenFilterChannels.get(3));
         Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
         Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9));
-        Imgproc.erode(greenFilterChannels.get(3), greenFilterChannels.get(3), erodeKernel);
-        Imgproc.dilate(greenFilterChannels.get(3), greenFilterChannels.get(3), dilateKernel);
 
-        Core.bitwise_and(grayFilterChannels.get(0), grayFilterChannels.get(1), grayFilterChannels.get(3));
-        Core.bitwise_and(grayFilterChannels.get(2), grayFilterChannels.get(3), grayFilterChannels.get(3));
-        Imgproc.erode(grayFilterChannels.get(3), grayFilterChannels.get(3), erodeKernel);
-        Imgproc.dilate(grayFilterChannels.get(3), grayFilterChannels.get(3), dilateKernel);
+        Mat greenFiltered = new Mat();
+        Core.bitwise_and(greenFilterChannels.get(0), greenFilterChannels.get(1), greenFiltered);
+        Core.bitwise_and(greenFilterChannels.get(2), greenFiltered, greenFiltered);
+        Imgproc.erode(greenFiltered, greenFiltered, erodeKernel);
+        Imgproc.dilate(greenFiltered, greenFiltered, dilateKernel);
+
+        Mat grayFiltered = new Mat();
+        Core.bitwise_and(grayFilterChannels.get(0), grayFilterChannels.get(1), grayFiltered);
+        Core.bitwise_and(grayFilterChannels.get(2), grayFiltered, grayFiltered);
+        Imgproc.erode(grayFiltered, grayFiltered, erodeKernel);
+        Imgproc.dilate(grayFiltered, grayFiltered, dilateKernel);
 
         //app.postImage(greenFilterChannels.get(3), "Green - After erode/dilate", this);
         //app.postImage(grayFilterChannels.get(3), "Gray - After erode/dilate", this);
 
         // Merge "grayed" reflexite with green reflexite
-        Core.bitwise_or(greenFilterChannels.get(3), grayFilterChannels.get(3), greenFilterChannels.get(3));
+        Core.bitwise_or(greenFiltered, grayFiltered, greenFiltered);
+
         //app.postImage(greenFilterChannels.get(3), "Merged", this);
 
-        return getLargestGoal(frame, greenFilterChannels);
+        return getLargestGoal(frame, greenFiltered);
     }
 }
