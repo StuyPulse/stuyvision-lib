@@ -17,9 +17,7 @@ import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 
-import gui.IntegerSliderVariable;
 import gui.Main;
 
 import java.util.Arrays;
