@@ -150,7 +150,7 @@ public class StuyVisionModule extends VisionModule {
         ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
         Imgproc.findContours(filteredImage, contour, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         double largestArea = 0.0;
-        RotatedRect largestRect = new RotatedRect();
+        RotatedRect largestRect = null;
 
         for (int i = 0; i < contour.size(); i++) {
             double currArea = Imgproc.contourArea(contour.get(i));
@@ -174,6 +174,15 @@ public class StuyVisionModule extends VisionModule {
                 largestArea = currArea;
                 largestRect = r;
             }
+        }
+
+        if (largestRect == null) {
+            // Send three (+Infinity)s to signal that
+            // nothing was found in the frame
+            if (withGui) {
+                app.postImage(frame, "Goals!", this);
+            }
+            return new double[] {6 / 0.0, 9 / 0.0, 4 / 0.0};
         }
 
         double[] vector = new double[3];
