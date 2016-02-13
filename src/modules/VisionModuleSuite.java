@@ -2,6 +2,7 @@ package modules;
 
 import java.io.File;
 
+import vision.DeviceCaptureSource;
 import vision.ImageCaptureSource;
 import vision.ModuleRunner;
 
@@ -15,13 +16,24 @@ public class VisionModuleSuite {
      *   - ImageCaptureSource
      */
     static {
+        // Device number 1, as on most computers 0 refers to
+        // the front-facing camera
+        runFromCamera(1);
+    }
+
+    private static void runFromDirectory() {
         String imageDirectory = VisionModuleSuite.class.getResource("").getPath() + "../../images/";
+        System.out.println(imageDirectory);
         File directory = new File(imageDirectory);
         File[] directoryListing = directory.listFiles();
         for (int i = 0; i < directoryListing.length && i < 10; i++) {
             if (i == 1 || i == 2) continue;
             System.out.println(directoryListing[i].getName());
-            ModuleRunner.addMapping(new ImageCaptureSource(imageDirectory + directoryListing[i].getName()), new VisionModule1());
+            ModuleRunner.addMapping(new ImageCaptureSource(imageDirectory + directoryListing[i].getName()), new StuyVisionModule());
         }
+    }
+
+    private static void runFromCamera(int deviceNumber) {
+        ModuleRunner.addMapping(new DeviceCaptureSource(deviceNumber), new StuyVisionModule());
     }
 }

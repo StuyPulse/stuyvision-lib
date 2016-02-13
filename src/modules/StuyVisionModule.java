@@ -5,6 +5,7 @@ import util.Sender;
 import vision.CaptureSource;
 import vision.DeviceCaptureSource;
 import vision.ImageCaptureSource;
+import vision.VisionModule;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -18,11 +19,15 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
+import gui.IntegerSliderVariable;
+import gui.Main;
+
 import java.util.Arrays;
 import java.util.ArrayList;
 
+import gui.IntegerSliderVariable;
 
-public class VisionModuleNoGui {
+public class StuyVisionModule extends VisionModule {
     public int minH_GREEN = 0;
     public int maxH_GREEN = 94;
     public int minS_GREEN = 88;
@@ -49,16 +54,18 @@ public class VisionModuleNoGui {
     public double r2 = 3.00;
 
     static {
-        String dir = VisionModuleNoGui.class.getClassLoader().getResource("").getPath();
+        String dir = StuyVisionModule.class.getClassLoader().getResource("").getPath();
         System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
+        // For running on Windows, use:
+        // System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
     }
 
     public static void main(String[] args) {
-        System.out.println("Hello from modules.VisionModuleNoGui.main");
+        System.out.println("Hello from modules.StuyVisionModule.main");
 
         CaptureSource cs = new DeviceCaptureSource(0);
         Sender sender = new Sender();
-        VisionModuleNoGui vm = new VisionModuleNoGui();
+        StuyVisionModule vm = new StuyVisionModule();
         vm.processAndSendIndefinitely(cs, sender, true);
     }
 
@@ -75,9 +82,9 @@ public class VisionModuleNoGui {
         }
     }
 
-    public double printFilesysteSpeedTest(String path) {
-        System.out.println("Running VisionModuleNoGui");
-        VisionModuleNoGui vm = new VisionModuleNoGui();
+    public double printFilesystemSpeedTest(String path) {
+        System.out.println("Running StuyVisionModule");
+        StuyVisionModule vm = new StuyVisionModule();
         double avgTime = vm.filesystemTest(path, 10);
         System.out.println("Average time: " + avgTime);
         return avgTime;
@@ -135,46 +142,55 @@ public class VisionModuleNoGui {
         return (r1 < ratio && ratio < r2) || (1 / r2< ratio && ratio < 1 / r1);
     }
 
-    private double[] getLargestGoal(Mat frame, Mat filteredImage) {
-            // Locate the goals
-            Mat drawn = frame.clone();
-            ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
-            Imgproc.findContours(filteredImage, contour, new Mat() , Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            double largestArea = 0.0;
-            RotatedRect largestRect = new RotatedRect();
+    private double[] getLargestGoal(Mat frame, Mat filteredImage, Main app) {
+        boolean withGui = app != null;
+        // Locate the goals
+        Mat drawn = frame.clone();
+        ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
+        Imgproc.findContours(filteredImage, contour, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        double largestArea = 0.0;
+        RotatedRect largestRect = new RotatedRect();
 
-            for (int i = 0; i < contour.size(); i++) {
-                double currArea = Imgproc.contourArea(contour.get(i));
-                if (currArea < AREA_THRESHOLD) {
-                    continue;
-                }
-                MatOfPoint2f tmp = new MatOfPoint2f();
-                contour.get(i).convertTo(tmp, CvType.CV_32FC1);
-                RotatedRect r = Imgproc.minAreaRect(tmp);
-                if (!aspectRatioThreshold(r.size.height, r.size.width)) {
-                    continue;
-                }
-                Point[] points = new Point[4];
-                r.points(points);
-                for (int line = 0; line < 4; line++) {
-                    Imgproc.line(drawn, points[line], points[(line + 1) % 4], new Scalar(0, 255, 0));
-                }
-                if (currArea > largestArea) {
-                    largestArea = currArea;
-                    largestRect = r;
-                }
+        for (int i = 0; i < contour.size(); i++) {
+            double currArea = Imgproc.contourArea(contour.get(i));
+            if (currArea < AREA_THRESHOLD) {
+                continue;
             }
-            Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
-            double[] vector = new double[3];
-            vector[0] = largestRect.center.x - (double)(frame.width() / 2);
-            vector[1] = largestRect.center.y - (double)(frame.height() / 2);
-            Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center, new Scalar(0, 0, 255));
-            vector[2] = largestRect.angle;
-            //app.postImage(drawn, "Goals!", this);
-            return vector;
+            MatOfPoint2f tmp = new MatOfPoint2f();
+            contour.get(i).convertTo(tmp, CvType.CV_32FC1);
+            RotatedRect r = Imgproc.minAreaRect(tmp);
+            if (!aspectRatioThreshold(r.size.height, r.size.width)) {
+                continue;
+            }
+            Point[] points = new Point[4];
+            r.points(points);
+            for (int line = 0; line < 4; line++) {
+                Imgproc.line(drawn, points[line], points[(line + 1) % 4], new Scalar(0, 255, 0));
+            }
+            if (currArea > largestArea) {
+                largestArea = currArea;
+                largestRect = r;
+            }
+        }
+        Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
+        double[] vector = new double[3];
+        vector[0] = largestRect.center.x - (double) (frame.width() / 2);
+        vector[1] = largestRect.center.y - (double) (frame.height() / 2);
+        Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center,
+                new Scalar(0, 0, 255));
+        vector[2] = largestRect.angle;
+        if (withGui) {
+            app.postImage(drawn, "Goals!", this);
+        }
+        return vector;
     }
 
-    public double[] hsvThresholding(Mat frame) {
+    public double[] getLargestGoal(Mat frame, Mat filteredImage) {
+        return getLargestGoal(frame, filteredImage, null);
+    }
+
+    public double[] hsvThresholding(Mat frame, Main app) {
+        boolean withGui = app != null;
         Mat hsv = new Mat();
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_BGR2HSV);
         ArrayList<Mat> greenFilterChannels = new ArrayList<Mat>();
@@ -213,14 +229,28 @@ public class VisionModuleNoGui {
         Imgproc.erode(grayFiltered, grayFiltered, erodeKernel);
         Imgproc.dilate(grayFiltered, grayFiltered, dilateKernel);
 
-        //app.postImage(greenFilterChannels.get(3), "Green - After erode/dilate", this);
-        //app.postImage(grayFilterChannels.get(3), "Gray - After erode/dilate", this);
+        if (withGui) {
+            app.postImage(greenFiltered, "Green - After erode/dilate", this);
+            app.postImage(grayFiltered, "Gray - After erode/dilate", this);
+        }
 
         // Merge "grayed" reflexite with green reflexite
         Core.bitwise_or(greenFiltered, grayFiltered, greenFiltered);
 
-        //app.postImage(greenFilterChannels.get(3), "Merged", this);
+        if (withGui) {
+            app.postImage(greenFiltered, "Merged", this);
+        }
 
-        return getLargestGoal(frame, greenFiltered);
+        return getLargestGoal(frame, greenFiltered, app);
+    }
+
+    public double[] hsvThresholding(Mat frame) {
+        return hsvThresholding(frame, null);
+    }
+
+    // For running as JavaFX gui
+    public Object run(Main app, Mat frame) {
+        app.postImage(frame, "Camera", this);
+        return hsvThresholding(frame, app);
     }
 }

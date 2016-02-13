@@ -26,7 +26,7 @@
     </path>
     
     <target name="run" depends="compile">
-        <java classname="modules.VisionModuleNoGui"
+        <java classname="modules.StuyVisionModule"
             classpathref="jars"
             dir="${basedir}/bin"
             failonerror="true" />

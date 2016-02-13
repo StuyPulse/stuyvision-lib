@@ -9,19 +9,19 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import gui.Main;
-import modules.VisionModule1;
+import modules.StuyVisionModule;
 import modules.VisionModuleSuite;
 
 public class TestImages {
 
     Main app;
     Mat frame;
-    VisionModule1 module;
+    StuyVisionModule module;
 
     @Before
     public void setup() {
         app = new Main();
-        module = new VisionModule1();
+        module = new StuyVisionModule();
     }
 
     @Test
