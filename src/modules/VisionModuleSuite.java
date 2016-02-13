@@ -2,6 +2,7 @@ package modules;
 
 import java.io.File;
 
+import vision.CaptureSource;
 import vision.DeviceCaptureSource;
 import vision.ImageCaptureSource;
 import vision.ModuleRunner;
@@ -18,7 +19,7 @@ public class VisionModuleSuite {
     static {
         // Device number 1, as on most computers 0 refers to
         // the front-facing camera
-        runFromCamera(1);
+        runFromCamera(0);
     }
 
     private static void runFromDirectory() {

@@ -21,23 +21,26 @@ import org.opencv.imgproc.Imgproc;
 import gui.Main;
 
 import java.util.Arrays;
+
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
 
 public class StuyVisionModule extends VisionModule {
-    public int minH_GREEN = 0;
-    public int maxH_GREEN = 94;
-    public int minS_GREEN = 88;
-    public int maxS_GREEN = 255;
-    public int minV_GREEN = 19;
-    public int maxV_GREEN = 255;
-    public int minH_GRAY = 0;
-    public int maxH_GRAY = 255;
-    public int minS_GRAY = 17;
-    public int maxS_GRAY = 118;
-    public int minV_GRAY = 120;
-    public int maxV_GRAY = 244;
+    public IntegerSliderVariable minH_GREEN = new IntegerSliderVariable("Min H Green", 0,  0,  255);
+    public IntegerSliderVariable maxH_GREEN = new IntegerSliderVariable("Max H Green", 94,  0,  255);
+    public IntegerSliderVariable minS_GREEN = new IntegerSliderVariable("Min S Green", 88, 0, 255);
+    public IntegerSliderVariable maxS_GREEN = new IntegerSliderVariable("Max S Green", 255,  0,  255);
+    public IntegerSliderVariable minV_GREEN = new IntegerSliderVariable("Min V Green", 200,  0,  255);
+    public IntegerSliderVariable maxV_GREEN = new IntegerSliderVariable("Max V Green", 255, 0, 255);
+    public IntegerSliderVariable minH_GRAY = new IntegerSliderVariable("Min H Gray", 0,  0,  255);
+    public IntegerSliderVariable maxH_GRAY = new IntegerSliderVariable("Max H Gray", 255,  0,  255);
+    public IntegerSliderVariable minS_GRAY = new IntegerSliderVariable("Min S Gray", 17, 0, 255);
+    public IntegerSliderVariable maxS_GRAY = new IntegerSliderVariable("Max S Gray", 118,  0,  255);
+    public IntegerSliderVariable minV_GRAY = new IntegerSliderVariable("Min V Gray", 120,  0,  255);
+    public IntegerSliderVariable maxV_GRAY = new IntegerSliderVariable("Max V Gray", 244, 0, 255);
     public int threshBlockSizeH = 78;
     public int threshConstantH = 0;
     public boolean useH = true;
@@ -48,6 +51,7 @@ public class StuyVisionModule extends VisionModule {
     public int threshConstantV = 0;
     public boolean useV = true;
     public double AREA_THRESHOLD = 600.0;
+    public DoubleSliderVariable areaThreshold = new DoubleSliderVariable("Area Threshold", 200.0, 0.0, 700.0);
     public double r1 = 1.25;
     public double r2 = 3.00;
 
@@ -62,22 +66,55 @@ public class StuyVisionModule extends VisionModule {
         System.out.println("Hello from modules.StuyVisionModule.main");
 
         CaptureSource cs = new DeviceCaptureSource(0);
-        Sender sender = new Sender();
+        //Sender sender = new Sender();
         StuyVisionModule vm = new StuyVisionModule();
-        vm.processAndSendIndefinitely(cs, sender, true);
+        vm.processAndSendIndefinitely(cs, null, true); // FIXME: PASS sender!!!!
+    }
+    // Camera constants
+    static double MAX_DEGREES_OFF_AUTO_AIMING = 5;
+    static int CAMERA_FRAME_PX_WIDTH = 1280;
+    static int CAMERA_FRAME_PX_HEIGHT = 720;
+    static int CAMERA_VIEWING_ANGLE_X = 180; // This is most likely wrong
+
+    private static double pxOffsetToDegrees(double px) {
+        return CAMERA_VIEWING_ANGLE_X * px / CAMERA_FRAME_PX_WIDTH;
     }
 
     public void processAndSendIndefinitely(
             CaptureSource cs, Sender sender, boolean printInfo) {
         Mat frame = new Mat();
-        for (;;) {
+        try {
+        PrintWriter writer = new PrintWriter("/tmp/cv-output.txt");
+        for (int i = 0;;i++) {
             cs.readFrame(frame);
             double[] vectorToGoal = hsvThresholding(frame);
             if (printInfo) {
-                System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
+            //    System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
             }
-            sender.sendDoubles(vectorToGoal);
+            if (i % 30 != 0) { continue; }
+            writer.println("\n\n======================================");
+            writer.println("Vector: " + Arrays.toString(vectorToGoal));
+            writer.flush();
+            if (vectorToGoal[0] == Double.POSITIVE_INFINITY
+                    && vectorToGoal[1] == Double.POSITIVE_INFINITY
+                    && vectorToGoal[2] == Double.POSITIVE_INFINITY) {
+                writer.println("NO GOAL IN FRAME");
+                writer.flush();
+                continue;
+            }
+            double degsOff = pxOffsetToDegrees(vectorToGoal[0]);
+            writer.println("Degree offest to account for: " + degsOff);
+            if (Math.abs(degsOff) < MAX_DEGREES_OFF_AUTO_AIMING) {
+                writer.println("CLOSE ENOUGH. SHOOT.");
+                writer.flush();
+                continue;
+            }
+            double rightWheelSpeed = -degsOff / (CAMERA_FRAME_PX_WIDTH / 2);
+            writer.println("MOVE MOTORS AS SUCH: (" + -rightWheelSpeed + ", " + rightWheelSpeed + ")");
+            writer.flush();
+            //sender.sendDoubles(vectorToGoal);
         }
+        } catch (Exception e) {}
     }
 
     public double printFilesystemSpeedTest(String path) {
@@ -154,7 +191,7 @@ public class StuyVisionModule extends VisionModule {
 
         for (int i = 0; i < contour.size(); i++) {
             double currArea = Imgproc.contourArea(contour.get(i));
-            if (currArea < AREA_THRESHOLD) {
+            if (currArea < areaThreshold.value()) {
                 continue;
             }
             MatOfPoint2f tmp = new MatOfPoint2f();
@@ -213,19 +250,19 @@ public class StuyVisionModule extends VisionModule {
 
         // Split HSV channels and process each channel
         Core.split(hsv, greenFilterChannels);
-        Core.inRange(greenFilterChannels.get(0), new Scalar(minH_GREEN), new Scalar(maxH_GREEN),
+        Core.inRange(greenFilterChannels.get(0), new Scalar(minH_GREEN.value()), new Scalar(maxH_GREEN.value()),
                 greenFilterChannels.get(0));
-        Core.inRange(greenFilterChannels.get(1), new Scalar(minS_GREEN), new Scalar(maxS_GREEN),
+        Core.inRange(greenFilterChannels.get(1), new Scalar(minS_GREEN.value()), new Scalar(maxS_GREEN.value()),
                 greenFilterChannels.get(1));
-        Core.inRange(greenFilterChannels.get(2), new Scalar(minV_GREEN), new Scalar(maxV_GREEN),
+        Core.inRange(greenFilterChannels.get(2), new Scalar(minV_GREEN.value()), new Scalar(maxV_GREEN.value()),
                 greenFilterChannels.get(2));
 
         Core.split(hsv, grayFilterChannels);
-        Core.inRange(grayFilterChannels.get(0), new Scalar(minH_GRAY), new Scalar(maxH_GRAY),
+        Core.inRange(grayFilterChannels.get(0), new Scalar(minH_GRAY.value()), new Scalar(maxH_GRAY.value()),
                 grayFilterChannels.get(0));
-        Core.inRange(grayFilterChannels.get(1), new Scalar(minS_GRAY), new Scalar(maxS_GRAY),
+        Core.inRange(grayFilterChannels.get(1), new Scalar(minS_GRAY.value()), new Scalar(maxS_GRAY.value()),
                 grayFilterChannels.get(1));
-        Core.inRange(grayFilterChannels.get(2), new Scalar(minV_GRAY), new Scalar(maxV_GRAY),
+        Core.inRange(grayFilterChannels.get(2), new Scalar(minV_GRAY.value()), new Scalar(maxV_GRAY.value()),
                 grayFilterChannels.get(2));
 
         // Merge channels and erode dilate to remove noise

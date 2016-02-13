@@ -2,7 +2,6 @@ package vision;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
-
 public class DeviceCaptureSource extends CaptureSource {
 
     private final int deviceNo;
