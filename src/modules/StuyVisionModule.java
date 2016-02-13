@@ -53,9 +53,9 @@ public class StuyVisionModule extends VisionModule {
 
     static {
         String dir = StuyVisionModule.class.getClassLoader().getResource("").getPath();
-        System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
+        //System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
         // For running on Windows, use:
-        // System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
+        System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
     }
 
     public static void main(String[] args) {
@@ -143,7 +143,10 @@ public class StuyVisionModule extends VisionModule {
     private double[] getLargestGoal(Mat frame, Mat filteredImage, Main app) {
         boolean withGui = app != null;
         // Locate the goals
-        Mat drawn = frame.clone();
+        Mat drawn = null;
+        if (withGui) {
+            drawn = frame.clone();
+        }
         ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
         Imgproc.findContours(filteredImage, contour, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         double largestArea = 0.0;
@@ -160,26 +163,31 @@ public class StuyVisionModule extends VisionModule {
             if (!aspectRatioThreshold(r.size.height, r.size.width)) {
                 continue;
             }
-            Point[] points = new Point[4];
-            r.points(points);
-            for (int line = 0; line < 4; line++) {
-                Imgproc.line(drawn, points[line], points[(line + 1) % 4], new Scalar(0, 255, 0));
+            if (withGui) {
+                Point[] points = new Point[4];
+                r.points(points);
+                for (int line = 0; line < 4; line++) {
+                    Imgproc.line(drawn, points[line], points[(line + 1) % 4], new Scalar(0, 255, 0));
+                }
             }
             if (currArea > largestArea) {
                 largestArea = currArea;
                 largestRect = r;
             }
         }
-        Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
+
         double[] vector = new double[3];
         vector[0] = largestRect.center.x - (double) (frame.width() / 2);
         vector[1] = largestRect.center.y - (double) (frame.height() / 2);
-        Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center,
-                new Scalar(0, 0, 255));
         vector[2] = largestRect.angle;
+
         if (withGui) {
+            Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
+            Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center,
+                    new Scalar(0, 0, 255));
             app.postImage(drawn, "Goals!", this);
         }
+
         return vector;
     }
 
