@@ -36,4 +36,11 @@ public class DeviceCaptureSource extends CaptureSource {
         return capture.read(mat);
     }
 
+    public void setExposure(int value) {
+        capture.set(15, value);
+    }
+
+    public void setBrightness(int value) {
+        capture.set(10, value);
+    }
 }

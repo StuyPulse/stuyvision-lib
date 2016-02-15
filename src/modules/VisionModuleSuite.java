@@ -34,6 +34,8 @@ public class VisionModuleSuite {
     }
 
     private static void runFromCamera(int deviceNumber) {
-        ModuleRunner.addMapping(new DeviceCaptureSource(deviceNumber), new StuyVisionModule());
+        DeviceCaptureSource cs = new DeviceCaptureSource(deviceNumber);
+        cs.setExposure(-10);
+        ModuleRunner.addMapping(cs, new StuyVisionModule());
     }
 }
