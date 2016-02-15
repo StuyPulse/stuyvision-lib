@@ -19,7 +19,7 @@ public class VisionModuleSuite {
     static {
         // Device number 1, as on most computers 0 refers to
         // the front-facing camera
-        runFromCamera(0);
+        runFromCamera(1);
     }
 
     private static void runFromDirectory() {

@@ -21,7 +21,7 @@ import org.opencv.imgproc.Imgproc;
 import gui.Main;
 
 import java.util.Arrays;
-
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -59,62 +59,64 @@ public class StuyVisionModule extends VisionModule {
         String dir = StuyVisionModule.class.getClassLoader().getResource("").getPath();
         //System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
         // For running on Windows, use:
-        System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
+        //System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
+        System.load("C:\\Users\\Justin Time\\workspace\\stuy-vision-2016\\lib\\opencv-3.0.0\\build\\java\\x64\\opencv_java300.dll");
     }
 
     public static void main(String[] args) {
         System.out.println("Hello from modules.StuyVisionModule.main");
 
         CaptureSource cs = new DeviceCaptureSource(0);
-        //Sender sender = new Sender();
+        System.out.println("Got camera");
+        Sender sender = new Sender();
         StuyVisionModule vm = new StuyVisionModule();
-        vm.processAndSendIndefinitely(cs, null, true); // FIXME: PASS sender!!!!
+        vm.processAndSendIndefinitely(cs, sender, true);
     }
     // Camera constants
-    static double MAX_DEGREES_OFF_AUTO_AIMING = 5;
+    static double MAX_DEGREES_OFF_AUTO_AIMING = 2;
     static int CAMERA_FRAME_PX_WIDTH = 1280;
     static int CAMERA_FRAME_PX_HEIGHT = 720;
-    static int CAMERA_VIEWING_ANGLE_X = 180; // This is most likely wrong
+    static int CAMERA_VIEWING_ANGLE_X = 100; // This is most likely wrong
 
     private static double pxOffsetToDegrees(double px) {
         return CAMERA_VIEWING_ANGLE_X * px / CAMERA_FRAME_PX_WIDTH;
     }
 
+    private static void printVectorInfo(double[] vectorToGoal, PrintStream writer) {
+        writer.println("\n\n======================================");
+        writer.println("" + System.currentTimeMillis());
+        writer.println("Vector: " + Arrays.toString(vectorToGoal));
+        writer.flush();
+        if (vectorToGoal[0] == Double.POSITIVE_INFINITY
+                && vectorToGoal[1] == Double.POSITIVE_INFINITY
+                && vectorToGoal[2] == Double.POSITIVE_INFINITY) {
+            writer.println("NO GOAL IN FRAME");
+            writer.flush();
+            return;
+        }
+        double degsOff = pxOffsetToDegrees(vectorToGoal[0]);
+        writer.println("Degree offest to account for: " + degsOff);
+        if (Math.abs(degsOff) < MAX_DEGREES_OFF_AUTO_AIMING) {
+            writer.println("CLOSE ENOUGH. SHOOT.");
+            writer.flush();
+            return;
+        }
+        double rightWheelSpeed = -degsOff / (CAMERA_FRAME_PX_WIDTH / 2);
+        writer.println("MOVE MOTORS AS SUCH: (" + -rightWheelSpeed + ", " + rightWheelSpeed + ")");
+        writer.flush();
+    }
+
     public void processAndSendIndefinitely(
             CaptureSource cs, Sender sender, boolean printInfo) {
         Mat frame = new Mat();
-        try {
-        PrintWriter writer = new PrintWriter("/tmp/cv-output.txt");
-        for (int i = 0;;i++) {
+        for (;;) {
             cs.readFrame(frame);
             double[] vectorToGoal = hsvThresholding(frame);
             if (printInfo) {
-            //    System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
+                System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
             }
-            if (i % 30 != 0) { continue; }
-            writer.println("\n\n======================================");
-            writer.println("Vector: " + Arrays.toString(vectorToGoal));
-            writer.flush();
-            if (vectorToGoal[0] == Double.POSITIVE_INFINITY
-                    && vectorToGoal[1] == Double.POSITIVE_INFINITY
-                    && vectorToGoal[2] == Double.POSITIVE_INFINITY) {
-                writer.println("NO GOAL IN FRAME");
-                writer.flush();
-                continue;
-            }
-            double degsOff = pxOffsetToDegrees(vectorToGoal[0]);
-            writer.println("Degree offest to account for: " + degsOff);
-            if (Math.abs(degsOff) < MAX_DEGREES_OFF_AUTO_AIMING) {
-                writer.println("CLOSE ENOUGH. SHOOT.");
-                writer.flush();
-                continue;
-            }
-            double rightWheelSpeed = -degsOff / (CAMERA_FRAME_PX_WIDTH / 2);
-            writer.println("MOVE MOTORS AS SUCH: (" + -rightWheelSpeed + ", " + rightWheelSpeed + ")");
-            writer.flush();
-            //sender.sendDoubles(vectorToGoal);
+            sender.sendDoubles(vectorToGoal);
         }
-        } catch (Exception e) {}
     }
 
     public double printFilesystemSpeedTest(String path) {
@@ -303,6 +305,8 @@ public class StuyVisionModule extends VisionModule {
     // For running as JavaFX gui
     public Object run(Main app, Mat frame) {
         app.postImage(frame, "Camera", this);
-        return hsvThresholding(frame, app);
+        double[] vectorToGoal = hsvThresholding(frame, app);
+        printVectorInfo(vectorToGoal, System.out);
+        return vectorToGoal;
     }
 }
