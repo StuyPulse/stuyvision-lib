@@ -53,10 +53,13 @@ public class StuyVisionModule extends VisionModule {
 
     static {
         String dir = StuyVisionModule.class.getClassLoader().getResource("").getPath();
-        //System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
-        // For running on Windows, use:
-        //System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
-        System.load("C:\\Users\\Justin Time\\workspace\\stuy-vision-2016\\lib\\opencv-3.0.0\\build\\java\\x64\\opencv_java300.dll");
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+			System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
+        } else {
+			System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
+        }
+        // Currently, for Justin Time:
+        // System.load("C:\\Users\\Justin Time\\workspace\\stuy-vision-2016\\lib\\opencv-3.0.0\\build\\java\\x64\\opencv_java300.dll");
     }
 
     public static void main(String[] args) {
