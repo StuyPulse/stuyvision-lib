@@ -25,18 +25,19 @@
         <pathelement path="${jssc}" />
     </path>
     
-    <target name="compile-and-run" depends="compile">
+    <target name="compile-and-run" depends="compile, run" />
+
+    <target name="run" depends="configure-camera">
         <java classname="modules.StuyVisionModule"
             classpathref="jars"
             dir="${basedir}/bin"
             failonerror="true" />
     </target>
 
-    <target name="run">
-        <java classname="modules.StuyVisionModule"
-            classpathref="jars"
-            dir="${basedir}/bin"
-            failonerror="true" />
+    <target name="configure-camera">
+        <exec executable="/bin/bash">
+            <arg value="setup_camera.sh" />
+        </exec>
     </target>
 
     <target name="compile" depends="init">
@@ -45,8 +46,7 @@
             source="1.8"
             target="1.8"
             verbose="true"
-            classpathref="jars">
-        </javac>
+            classpathref="jars" />
     </target>
  
     <target name="init">
