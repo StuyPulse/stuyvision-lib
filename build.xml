@@ -1,4 +1,4 @@
-<project name="stuy-vision-2016" default="run" basedir=".">
+<project name="stuy-vision-2016" default="compile-and-run" basedir=".">
     <!--
         Before running for the first time, run the following (but
         use two dashes):
@@ -25,13 +25,19 @@
         <pathelement path="${jssc}" />
     </path>
     
-    <target name="run" depends="compile">
+    <target name="compile-and-run" depends="compile">
         <java classname="modules.StuyVisionModule"
             classpathref="jars"
             dir="${basedir}/bin"
             failonerror="true" />
     </target>
-    
+
+    <target name="run">
+        <java classname="modules.StuyVisionModule"
+            classpathref="jars"
+            dir="${basedir}/bin"
+            failonerror="true" />
+    </target>
 
     <target name="compile" depends="init">
         <javac srcdir="src"
