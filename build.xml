@@ -36,7 +36,7 @@
 
     <target name="configure-camera">
         <exec executable="/bin/bash">
-            <arg value="setup_camera.sh" />
+            <arg value="setup-camera.sh" />
         </exec>
     </target>
 
