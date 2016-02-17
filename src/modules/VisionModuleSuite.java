@@ -2,6 +2,7 @@ package modules;
 
 import java.io.File;
 
+import vision.CaptureSource;
 import vision.DeviceCaptureSource;
 import vision.ImageCaptureSource;
 import vision.ModuleRunner;
