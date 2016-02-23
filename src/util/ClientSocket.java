@@ -3,7 +3,6 @@ package util;
 import java.net.Socket;
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.util.Scanner;
 import java.net.UnknownHostException;
 
 public class ClientSocket {
