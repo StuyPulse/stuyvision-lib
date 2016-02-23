@@ -1,6 +1,6 @@
 package modules;
 
-import util.Sender;
+import util.ClientSocket;
 
 import vision.CaptureSource;
 import vision.DeviceCaptureSource;
@@ -18,14 +18,13 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import gui.Main;
-
-import java.util.Arrays;
-import java.io.PrintStream;
-import java.util.ArrayList;
-
 import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
+import gui.Main;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class StuyVisionModule extends VisionModule {
     public IntegerSliderVariable minH_GREEN = new IntegerSliderVariable("Min H Green", 58,  0,  255);
@@ -71,9 +70,10 @@ public class StuyVisionModule extends VisionModule {
 
         CaptureSource cs = new DeviceCaptureSource(0);
         System.out.println("Got camera");
-        Sender sender = new Sender();
+        //Sender sender = new Sender();
+        ClientSocket socket = new ClientSocket();
         StuyVisionModule vm = new StuyVisionModule();
-        vm.processAndSendIndefinitely(cs, sender, true);
+        vm.processAndSendIndefinitely(cs, socket, true);
     }
     // Camera constants
     static double MAX_DEGREES_OFF_AUTO_AIMING = 2;
@@ -110,7 +110,7 @@ public class StuyVisionModule extends VisionModule {
     }
 
     public void processAndSendIndefinitely(
-            CaptureSource cs, Sender sender, boolean printInfo) {
+            CaptureSource cs, ClientSocket socket, boolean printInfo) {
         Mat frame = new Mat();
         for (;;) {
             cs.readFrame(frame);
@@ -118,7 +118,7 @@ public class StuyVisionModule extends VisionModule {
             if (printInfo) {
                 System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
             }
-            sender.sendDoubles(vectorToGoal);
+            socket.sendDoubles(vectorToGoal);
         }
     }
 
@@ -130,29 +130,19 @@ public class StuyVisionModule extends VisionModule {
         return avgTime;
     }
 
-    public void printBytesSendTest(Sender sender, int numBytes) {
-        System.out.println("About to send raw bytes to Tegra");
-        byte[] bytes = new byte[numBytes];
-        for (int i = 0; i < bytes.length; i += 1) {
-            bytes[i] = (byte) (i + 65);
-        }
-        sender.sendData(bytes);
-        System.out.println("Sent " + numBytes + " bytes");
-    }
-
-    public void printDoublesSendTest(Sender sender) {
+    public void printDoublesSendTest(ClientSocket socket) {
         System.out.println("About to send doubles");
         double[] doubles = new double[10];
         for (int i = 0; i < doubles.length; i += 1) {
             doubles[i] = ((double) i) * 1.25;
         }
-        sender.sendDoubles(doubles);
+        socket.sendDoubles(doubles);
         System.out.println("Sent ten doubles");
     }
 
-    public void processAndSend(Mat frame, Sender sender) {
+    public void processAndSend(Mat frame, ClientSocket socket) {
         double[] vector = hsvThresholding(frame);
-        sender.sendDoubles(vector);
+        socket.sendDoubles(vector);
     }
 
     private double cameraTest(int iters) {
