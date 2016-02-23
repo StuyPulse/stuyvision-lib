@@ -22,7 +22,6 @@ import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
 import gui.Main;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,7 +88,7 @@ public class StuyVisionModule extends VisionModule {
         return CAMERA_VIEWING_ANGLE_X * px / CAMERA_FRAME_PX_WIDTH;
     }
 
-    private static void printVectorInfo(double[] vectorToGoal, PrintStream writer) {
+    private static void printVectorInfo(double[] vectorToGoal, PrintWriter writer) {
         writer.println("\n\n======================================");
         writer.println("" + System.currentTimeMillis());
         writer.println("Vector: " + Arrays.toString(vectorToGoal));
@@ -286,7 +285,7 @@ public class StuyVisionModule extends VisionModule {
     public Object run(Main app, Mat frame) {
         app.postImage(frame, "Camera", this);
         double[] vectorToGoal = hsvThresholding(frame, app);
-        printVectorInfo(vectorToGoal, System.out);
+        printVectorInfo(vectorToGoal, writer);
         return vectorToGoal;
     }
 }

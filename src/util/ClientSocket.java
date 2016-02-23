@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 
 public class ClientSocket {
 
-    private static String host = "localhost"; // TODO
+    private static String host = "roborio-694-frc.local";
     private static int port = 7054;
 
     private Socket server;
@@ -16,11 +16,12 @@ public class ClientSocket {
     public ClientSocket() {
         setupSocket();
     }
-    
+
     public boolean setupSocket() {
         try {
             server = new Socket(host, port);
             serverOut = new PrintWriter(server.getOutputStream(), true);
+            return true;
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return false;
@@ -28,7 +29,6 @@ public class ClientSocket {
             e.printStackTrace();
             return false;
         }
-        return true;
     }
 
     public boolean socketExists() {
