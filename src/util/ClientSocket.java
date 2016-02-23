@@ -40,6 +40,10 @@ public class ClientSocket {
             return;
         }
         String msg = data[0] + "," + data[1] + "," + data[2];
-        serverOut.println(msg);
+        if (serverOut != null) {
+            serverOut.println(msg);
+        } else {
+            setupSocket();
+        }
     }
 }
