@@ -23,6 +23,7 @@ import gui.IntegerSliderVariable;
 import gui.Main;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -56,6 +57,8 @@ public class StuyVisionModule extends VisionModule {
     public DoubleSliderVariable r1 = new DoubleSliderVariable("Min ratio theshold", 1.1, 0.0, 4.0);
     public DoubleSliderVariable r2 = new DoubleSliderVariable("Max ratio theshold", 3.0, 0.0, 4.0);
 
+    private static PrintWriter writer = null;
+
     static {
         String dir = StuyVisionModule.class.getClassLoader().getResource("").getPath();
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
@@ -63,6 +66,7 @@ public class StuyVisionModule extends VisionModule {
         } else {
 			System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
         }
+        try {writer = new PrintWriter("logs.txt");} catch (Exception e) {}
     }
 
     public static void main(String[] args) {
@@ -266,7 +270,12 @@ public class StuyVisionModule extends VisionModule {
             app.postImage(greenFiltered, "Merged", this);
         }
 
-        return getLargestGoal(frame, greenFiltered, app);
+        double[] output = getLargestGoal(frame, greenFiltered, app);
+        try {
+            writer.println("Vector calculated: " + Arrays.toString(output));
+            writer.flush();
+        } catch (Exception e) {}
+        return output;
     }
 
     public double[] hsvThresholding(Mat frame) {
