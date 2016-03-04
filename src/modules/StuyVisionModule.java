@@ -1,11 +1,8 @@
 package modules;
 
-import util.ClientSocket;
-
-import vision.CaptureSource;
-import vision.DeviceCaptureSource;
-import vision.ImageCaptureSource;
-import vision.VisionModule;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -21,10 +18,12 @@ import org.opencv.imgproc.Imgproc;
 import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
 import gui.Main;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
+import util.ClientSocket;
+import util.TegraServer;
+import vision.CaptureSource;
+import vision.DeviceCaptureSource;
+import vision.ImageCaptureSource;
+import vision.VisionModule;
 
 public class StuyVisionModule extends VisionModule {
     public IntegerSliderVariable minH_GREEN = new IntegerSliderVariable("Min H Green", 58,  0,  255);
@@ -73,10 +72,9 @@ public class StuyVisionModule extends VisionModule {
 
         CaptureSource cs = new DeviceCaptureSource(0);
         System.out.println("Got camera");
-        //Sender sender = new Sender();
-        ClientSocket socket = new ClientSocket();
+        TegraServer server = new TegraServer();
         StuyVisionModule vm = new StuyVisionModule();
-        vm.processAndSendIndefinitely(cs, socket, true);
+        vm.processAndSendIndefinitely(cs, server, true);
     }
     // Camera constants
     static double MAX_DEGREES_OFF_AUTO_AIMING = 2;
@@ -113,7 +111,7 @@ public class StuyVisionModule extends VisionModule {
     }
 
     public void processAndSendIndefinitely(
-            CaptureSource cs, ClientSocket socket, boolean printInfo) {
+            CaptureSource cs, TegraServer server, boolean printInfo) {
         Mat frame = new Mat();
         for (;;) {
             cs.readFrame(frame);
@@ -121,7 +119,7 @@ public class StuyVisionModule extends VisionModule {
             if (printInfo) {
                 System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
             }
-            socket.sendDoubles(vectorToGoal);
+            server.sendDoubles(vectorToGoal);
         }
     }
 

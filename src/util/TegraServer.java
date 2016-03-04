@@ -9,12 +9,8 @@ public class TegraServer {
     private Socket server;
     private PrintWriter serverOut;
 
-    // Tegra 1: 10.42.0.12
-    // Tegra 2: 10.42.0.55
-    // Tegra 3: 10.42.0.98
-    private static final String tegraHost = "10.42.0.55";
-
-    private static final int tegraPort = 7054;
+    private static String host = "roborio-694-frc.local";
+    private static int port = 7054;
 
     public TegraServer() {
         setupSocket();
@@ -25,7 +21,7 @@ public class TegraServer {
      */
     private void setupSocket() {
         try {
-            server = new Socket(tegraHost, tegraPort);
+            server = new Socket(host, port);
             serverOut = new PrintWriter(server.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
