@@ -1,18 +1,13 @@
 package util;
 
-import java.net.Socket;
-import java.net.ServerSocket;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class TegraServer {
 
-    private ServerSocket socket;
-    private Socket portInput;
+    private Socket server;
+    private PrintWriter serverOut;
 
     // Tegra 1: 10.42.0.12
     // Tegra 2: 10.42.0.55
@@ -30,61 +25,34 @@ public class TegraServer {
      */
     private void setupSocket() {
         try {
-            //socket = new ServerSocket(socketPort);
-            //socket.setSoTimeout(socketTimeout);
-            socket = new Socket(tegraHost, tegraPort);
+            server = new Socket(tegraHost, tegraPort);
+            serverOut = new PrintWriter(server.getOutputStream(), true);
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void run() {
-        try {
-            portInput = socket.accept();
-            BufferedReader in =
-                    new BufferedReader(
-                        new InputStreamReader(portInput.getInputStream()));
-
-            while (!Thread.currentThread().isInterrupted()) {
-                latestData.set(parseMessage(in.readLine()));
-                System.out.println(Arrays.toString(latestData.get()));
-            }
-            socket.close();
-        } catch (IOException e) {
-            if (e instanceof InterruptedIOException) {
-                System.out.println("Connection timed out");
-            }
             e.printStackTrace();
         }
     }
 
     /**
-     * Parses three doubles separated by commas into an array of 3
-     * <code>double</code>s
-     * @param data Three <code>double</code> literals separated by commas,
-     * with optional whitespace around each <code>double</code>
-     * @return An array of three <code>double</code>s, read from
-     * <code>data</code>
+     * Check if the socket has been created
+     * @return <code>true</code> if the socket has been created, <code>false</code> otherwise
      */
-    private static double[] parseMessage(String data) {
-        String[] dbls = data.split(",");
-        if (dbls.length < 3) {
-            return null;
-        }
-        double[] result = new double[3];
-        for (int i = 0; i < dbls.length; i++) {
-            // trim() takes off trailing \n
-            result[i] = Double.parseDouble(dbls[i].trim());
-        }
-        if (result[0] == Double.POSITIVE_INFINITY
-                && result[1] == Double.POSITIVE_INFINITY
-                && result[2] == Double.POSITIVE_INFINITY) {
-            return null;
-        }
-        return result;
+    public boolean socketExists() {
+        return serverOut != null;
     }
-    
-    public double[] getMostRecent() {
-        return latestData.get();
+
+    /**
+     * Send an array of doubles using the socket
+     * @param data Array of doubles to send
+     */
+    public void sendDoubles(double[] data) {
+        if (data.length != 3) {
+            return;
+        }
+        String msg = data[0] + "," + data[1] + "," + data[2];
+        if (serverOut != null) {
+            serverOut.println(msg);
+        } else {
+            setupSocket();
+        }
     }
 }
