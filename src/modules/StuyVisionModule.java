@@ -18,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
 import gui.Main;
-import util.ClientSocket;
 import util.TegraServer;
 import vision.CaptureSource;
 import vision.DeviceCaptureSource;
@@ -72,6 +71,7 @@ public class StuyVisionModule extends VisionModule {
 
         CaptureSource cs = new DeviceCaptureSource(0);
         System.out.println("Got camera");
+
         TegraServer server = new TegraServer();
         StuyVisionModule vm = new StuyVisionModule();
         vm.processAndSendIndefinitely(cs, server, true);
@@ -119,7 +119,7 @@ public class StuyVisionModule extends VisionModule {
             if (printInfo) {
                 System.out.println("Sent vector: " + Arrays.toString(vectorToGoal));
             }
-            server.sendDoubles(vectorToGoal);
+            server.sendData(vectorToGoal);
         }
     }
 
@@ -131,19 +131,19 @@ public class StuyVisionModule extends VisionModule {
         return avgTime;
     }
 
-    public void printDoublesSendTest(ClientSocket socket) {
+    public void printDoublesSendTest(TegraServer server) {
         System.out.println("About to send doubles");
         double[] doubles = new double[10];
         for (int i = 0; i < doubles.length; i += 1) {
             doubles[i] = ((double) i) * 1.25;
         }
-        socket.sendDoubles(doubles);
+        server.sendData(doubles);
         System.out.println("Sent ten doubles");
     }
 
-    public void processAndSend(Mat frame, ClientSocket socket) {
+    public void processAndSend(Mat frame, TegraServer server) {
         double[] vector = hsvThresholding(frame);
-        socket.sendDoubles(vector);
+        server.sendData(vector);
     }
 
     private double cameraTest(int iters) {
