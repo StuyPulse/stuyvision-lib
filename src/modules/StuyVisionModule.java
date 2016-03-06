@@ -21,7 +21,6 @@ import gui.Main;
 import util.TegraServer;
 import vision.CaptureSource;
 import vision.DeviceCaptureSource;
-import vision.ImageCaptureSource;
 import vision.VisionModule;
 
 public class StuyVisionModule extends VisionModule {
@@ -88,33 +87,39 @@ public class StuyVisionModule extends VisionModule {
         return vectorToGoal;
     }
 
+    /**
+     * Given the dimensions of a rectangle, return whether the ratio of
+     * these rectangle's dimensions suggests it may be a valid goal.
+     * @param height
+     * @param width
+     * @return
+     */
     private boolean aspectRatioThreshold(double height, double width) {
         double ratio = width / height;
         return (minRatioThreshold.value() < ratio && ratio < maxRatioThreshold.value())
                 || (1 / maxRatioThreshold.value() < ratio && ratio < 1 / minRatioThreshold.value());
     }
 
-    private double[] getLargestGoal(Mat frame, Mat filteredImage, Main app) {
+    private double[] getLargestGoal(Mat originalFrame, Mat filteredImage, Main app) {
         boolean withGui = app != null;
-        // Locate the goals
         Mat drawn = null;
         if (withGui) {
             // `drawn` will be the original image with info about what was
             // found in it drawn onto it
-            drawn = frame.clone();
+            drawn = originalFrame.clone();
         }
-        ArrayList<MatOfPoint> contour = new ArrayList<MatOfPoint>();
-        Imgproc.findContours(filteredImage, contour, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Imgproc.findContours(filteredImage, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         double largestArea = 0.0;
         RotatedRect largestRect = null;
 
-        for (int i = 0; i < contour.size(); i++) {
-            double currArea = Imgproc.contourArea(contour.get(i));
+        for (int i = 0; i < contours.size(); i++) {
+            double currArea = Imgproc.contourArea(contours.get(i));
             if (currArea < minAreaThreshold.value() || currArea > maxAreaThreshold.value()) {
                 continue;
             }
             MatOfPoint2f tmp = new MatOfPoint2f();
-            contour.get(i).convertTo(tmp, CvType.CV_32FC1);
+            contours.get(i).convertTo(tmp, CvType.CV_32FC1);
             RotatedRect r = Imgproc.minAreaRect(tmp);
             if (!aspectRatioThreshold(r.size.height, r.size.width)) {
                 continue;
@@ -136,7 +141,7 @@ public class StuyVisionModule extends VisionModule {
         if (largestRect == null) {
             if (withGui) {
                 // Post the unchanged image anyway for visual consistency
-                app.postImage(frame, "No goals found", this);
+                app.postImage(originalFrame, "Goals", this);
             }
             // Use three `+Infinity`s to signal that nothing was found in the frame
             // There is exactly one `double` representation of `+Infinity`
@@ -144,15 +149,30 @@ public class StuyVisionModule extends VisionModule {
         }
 
         double[] vector = new double[3];
-        vector[0] = largestRect.center.x - (double) (frame.width() / 2);
-        vector[1] = largestRect.center.y - (double) (frame.height() / 2);
+        vector[0] = largestRect.center.x - (double) (originalFrame.width() / 2);
+        vector[1] = largestRect.center.y - (double) (originalFrame.height() / 2);
         vector[2] = largestRect.angle;
 
         if (withGui) {
+            // Draw the vector (`vector[0]`, `vector[1]`) from the center of
+            // the frame to that of `largestRect`
+            double h = originalFrame.height();
             Imgproc.circle(drawn, largestRect.center, 1, new Scalar(0, 0, 255), 2);
-            Imgproc.line(drawn, new Point(frame.width() / 2, frame.height() / 2), largestRect.center,
+            Imgproc.line(drawn,
+                    new Point(originalFrame.width() / 2, h / 2),
+                    largestRect.center,
                     new Scalar(0, 0, 255));
-            app.postImage(drawn, "Goals!", this);
+
+            // Draw the components of the vector
+            Point textPos = new Point(0, h - 30);
+            Point shadingTL = new Point(0, h - 50);
+            Point shadingBR = new Point(80, h);
+            Imgproc.rectangle(drawn, shadingTL, shadingBR, new Scalar(200, 200, 200), Core.FILLED);
+            Imgproc.putText(drawn, "X: " + Math.round(vector[0]), textPos, 0, 0.6, new Scalar(255, 0, 0));
+            textPos.y += 20;
+            Imgproc.putText(drawn, "Y: " + Math.round(vector[1]), textPos, 0, 0.6, new Scalar(0, 0, 255));
+
+            app.postImage(drawn, "Goals", this);
         }
 
         return vector;
@@ -177,12 +197,15 @@ public class StuyVisionModule extends VisionModule {
      * tilted
      */
     public double[] hsvThresholding(Mat frame, Main app) {
+        // If `app` is null, we will not try to post images to it
         boolean withGui = app != null;
+
+        // Convert BGR camera image to HSV for processing
         Mat hsv = new Mat();
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_BGR2HSV);
-        ArrayList<Mat> greenFilterChannels = new ArrayList<Mat>();
 
         // Split HSV channels and process each channel
+        ArrayList<Mat> greenFilterChannels = new ArrayList<Mat>();
         Core.split(hsv, greenFilterChannels);
         Core.inRange(greenFilterChannels.get(0), new Scalar(minH_GREEN.value()), new Scalar(maxH_GREEN.value()),
                 greenFilterChannels.get(0));
@@ -191,19 +214,21 @@ public class StuyVisionModule extends VisionModule {
         Core.inRange(greenFilterChannels.get(2), new Scalar(minV_GREEN.value()), new Scalar(maxV_GREEN.value()),
                 greenFilterChannels.get(2));
 
-        // Merge channels and erode dilate to remove noise
-        Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9));
-
+        // Merge filtered H, S and V back into one binarized image
         Mat greenFiltered = new Mat();
         Core.bitwise_and(greenFilterChannels.get(0), greenFilterChannels.get(1), greenFiltered);
         Core.bitwise_and(greenFilterChannels.get(2), greenFiltered, greenFiltered);
+        if (withGui) {
+            app.postImage(greenFiltered, "After filtering H, S, V; before erode/dilate", this);
+        }
+
+        // Erode and dilate to remove noise
+        Mat erodeKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
+        Mat dilateKernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9));
         Imgproc.erode(greenFiltered, greenFiltered, erodeKernel);
         Imgproc.dilate(greenFiltered, greenFiltered, dilateKernel);
-
         if (withGui) {
-            app.postImage(greenFiltered, "Green - After erode/dilate", this);
-            app.postImage(greenFiltered, "Merged", this);
+            app.postImage(greenFiltered, "After erode/dilate", this);
         }
 
         double[] output = getLargestGoal(frame, greenFiltered, app);
@@ -215,7 +240,8 @@ public class StuyVisionModule extends VisionModule {
     }
 
     /**
-     * Call hsvThresholding with <code>null</code> for the <code>app</code>.
+     * Call hsvThresholding with <code>null</code> for the <code>app</code>, to
+     * process an image without using a gui.
      * See doc for <code>hsvThresholding(Mat, Main)</code> for detail.
      * @param frame Image to process
      * @return
