@@ -1,9 +1,5 @@
 package util;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -14,23 +10,13 @@ import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
 public class TegraServer {
-    
-    public static void main(String[] args) {
-        TegraServer ts = new TegraServer();
-        ts.connectToAClient();
-        Scanner s = new Scanner(System.in);
-        while (s.hasNext()) {
-            ts.sendData(parseMessage(s.nextLine()));
-        }
-        s.close();
-    }
+
     private ServerSocket serverSocket;
     private Socket client;
-    private BufferedReader clientReader;
     private BufferedWriter clientWriter;
 
-    private static final int tegraPort = 7123;//7054;
-    
+    private static final int tegraPort = 7123;
+
     private static final int soTimeout = 500; // in ms
 
     public TegraServer() {
@@ -47,7 +33,8 @@ public class TegraServer {
             serverSocket.setSoTimeout(soTimeout);
             System.out.println("Set up server");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("An IOException has occured when"
+                + " creating `serverSocket`. Message: " + e.getMessage());
         }
     }
 
@@ -63,25 +50,27 @@ public class TegraServer {
             clientWriter.write(data);
             clientWriter.newLine();
             clientWriter.flush();
-            System.out.println("Sent String");
+            System.out.println("Sent data");
         } catch (SocketException e) {
             // This occurs when the client closes, so we need
             // to clear current connection objects and reconnect
             client = null;
             clientWriter = null;
-            clientReader = null;
             // And try sending it again, reconnecting to the client
             sendString(data);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("An IOException has occured. Message: " + e.getMessage());
         }
     }
 
     public String stringifyData(double[] vector) {
-        // Exclude "\n" from return value because running `clientWriter.newLine()`
+        // Don't include "\n" in return value because running `clientWriter.newLine()`
         // after `.write()`ing is more reliable than including "\n" in the
         // `.write()` String. `.newLine()` sends whatever newline sequence
         // is necessary for the system, not necessarily \n.
+        if (vector == null) {
+            return "none";
+        }
         return vector[0] + "," + vector[1] + "," + vector[2];
     }
 
@@ -91,42 +80,47 @@ public class TegraServer {
             while (client == null) {
                 try {
                     client = serverSocket.accept();
-                    System.out.println(".accept()ed connection with client");
+                    System.out.println("Connected with client");
                 } catch (SocketTimeoutException e) {
                     // Ignore and try again to accept()
-                    System.out.println("timeout except");
+                    System.out.println("Connection timed out. Trying again.");
                 }
             }
             clientWriter =
                     new BufferedWriter(
                             new OutputStreamWriter(client.getOutputStream()));
-            // Probably won't ever be necessary:
-            //clientReader =
-            //        new BufferedReader(
-            //                new InputStreamReader(client.getInputStream()));
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("An IOException has occured. Message: " + e.getMessage());
             return false;
         }
     }
+
+    // Only for testing/demoing without a roborio:
     private static double[] parseMessage(String data) {
+        if (data.equals("none")) {
+            return null;
+        }
         String[] dbls = data.split(",");
         if (dbls.length < 3) {
             return null;
         }
         double[] result = new double[3];
         for (int i = 0; i < dbls.length; i++) {
-            // trim() takes off trailing \n
-            result[i] = Double.parseDouble(dbls[i].trim());
+            // parseDouble auto-trims
+            result[i] = Double.parseDouble(dbls[i]);
         }
-        // Don't do this here, parseMessage is only here for
-        // testing as it is.
-        //if (result[0] == Double.POSITIVE_INFINITY
-        //        && result[1] == Double.POSITIVE_INFINITY
-        //        && result[2] == Double.POSITIVE_INFINITY) {
-        //    return null;
-        //}
         return result;
+    }
+
+    // Only run during testing
+    public static void main(String[] args) {
+        TegraServer ts = new TegraServer();
+        ts.connectToAClient();
+        Scanner s = new Scanner(System.in);
+        while (s.hasNext()) {
+            ts.sendData(parseMessage(s.nextLine()));
+        }
+        s.close();
     }
 }

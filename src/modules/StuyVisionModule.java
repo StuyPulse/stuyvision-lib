@@ -143,14 +143,13 @@ public class StuyVisionModule extends VisionModule {
                 // Post the unchanged image anyway for visual consistency
                 app.postImage(originalFrame, "Goals", this);
             }
-            // Use three `+Infinity`s to signal that nothing was found in the frame
-            // There is exactly one `double` representation of `+Infinity`
-            return new double[] {6 / 0.0, 9 / 0.0, 4 / 0.0};
+            // Return null to signify no goal found
+            return null;
         }
 
         double[] vector = new double[3];
-        vector[0] = largestRect.center.x - (double) (originalFrame.width() / 2);
-        vector[1] = largestRect.center.y - (double) (originalFrame.height() / 2);
+        vector[0] = largestRect.center.x - originalFrame.width() / 2.0;
+        vector[1] = largestRect.center.y - originalFrame.height() / 2.0;
         vector[2] = largestRect.angle;
 
         if (withGui) {
