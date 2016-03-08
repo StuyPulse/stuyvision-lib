@@ -19,11 +19,14 @@ public class VisionModuleSuite {
     static {
         // Device number 1, as on most computers 0 refers to
         // the front-facing camera
-        runFromCamera(0);
+        runFromCamera(1);
     }
 
     private static void runFromDirectory() {
         String imageDirectory = VisionModuleSuite.class.getResource("").getPath() + "../../images/";
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            imageDirectory = imageDirectory.substring(1); // Chop off leading / that appears before C:
+        }
         System.out.println(imageDirectory);
         File directory = new File(imageDirectory);
         File[] directoryListing = directory.listFiles();
