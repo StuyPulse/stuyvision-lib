@@ -18,10 +18,11 @@ import org.opencv.imgproc.Imgproc;
 import gui.DoubleSliderVariable;
 import gui.IntegerSliderVariable;
 import gui.Main;
-import util.TegraServer;
 import vision.CaptureSource;
 import vision.DeviceCaptureSource;
 import vision.VisionModule;
+import util.TegraServer;
+import util.DebugPrinter;
 
 public class StuyVisionModule extends VisionModule {
 
@@ -51,13 +52,15 @@ public class StuyVisionModule extends VisionModule {
 
     static {
         // Load opencv native library
-        String dir = StuyVisionModule.class.getClassLoader().getResource("").getPath();
-        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-			System.load(dir + "..\\lib\\opencv-3.0.0\\build\\lib\\opencv_java300.dll");
-        } else {
-			System.load(dir + "../lib/opencv-3.0.0/build/lib/libopencv_java300.so");
+        DebugPrinter.println("Loading OpenCV version " + Core.VERSION);
+        DebugPrinter.println("Native library path: " + System.getProperty("java.library.path"));
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        DebugPrinter.println("System.loadLibrary succeeded");
+        try {
+            logWriter = new PrintWriter("logs.txt");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        try {logWriter = new PrintWriter("logs.txt");} catch (Exception e) {}
     }
 
     // For running CV without a gui (e.g., on a Tegra on the bot)
@@ -293,9 +296,10 @@ public class StuyVisionModule extends VisionModule {
         writer.println("Time: " + System.currentTimeMillis());
         writer.println("Vector: " + Arrays.toString(vectorToGoal));
         writer.flush();
-        if (vectorToGoal[0] == Double.POSITIVE_INFINITY
-                && vectorToGoal[1] == Double.POSITIVE_INFINITY
-                && vectorToGoal[2] == Double.POSITIVE_INFINITY) {
+        if (vectorToGoal == null
+                || (vectorToGoal[0] == Double.POSITIVE_INFINITY
+                    && vectorToGoal[1] == Double.POSITIVE_INFINITY
+                    && vectorToGoal[2] == Double.POSITIVE_INFINITY)) {
             writer.println("NO GOAL IN FRAME");
             writer.flush();
             return;

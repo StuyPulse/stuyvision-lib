@@ -13,9 +13,10 @@ public class ModuleRunner {
     private static final int FPS = 10;
 
     static {
-        DebugPrinter.println("OpenCV version: " + Core.VERSION);
+        DebugPrinter.println("Loading OpenCV version " + Core.VERSION);
         DebugPrinter.println("Native library path: " + System.getProperty("java.library.path"));
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        DebugPrinter.println("System.loadLibrary succeeded");
     }
 
     public static void addMapping(CaptureSource captureSource, VisionModule... modules) {

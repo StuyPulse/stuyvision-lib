@@ -3,6 +3,7 @@ package gui;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -21,9 +22,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import modules.VisionModuleSuite;
 import vision.ModuleRunner;
 import vision.VisionModule;
+import util.DebugPrinter;
 
 public class Main extends Application {
     private TabPane root;
@@ -31,6 +34,13 @@ public class Main extends Application {
     private HashMap<Integer, ControlsController> tabs = new HashMap<Integer, ControlsController>();
     private ModuleRunner moduleRunner = new ModuleRunner();
     private HashMap<String, ImageFrame> images = new HashMap<String, ImageFrame>();
+
+    static {
+        DebugPrinter.println("Loading OpenCV version " + Core.VERSION);
+        DebugPrinter.println("Native library path: " + System.getProperty("java.library.path"));
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        DebugPrinter.println("System.loadLibrary succeeded");
+    }
 
     @Override
     public void start(Stage primaryStage) {
