@@ -12,13 +12,13 @@
     <property name="srcdir" value="src" />
     <property name="bindir" value="bin" />
 
-    <property name="opencv_home" value="${basedir}/lib/opencv-3.0.0" />
+    <property name="opencv_home" value="lib/opencv-3.0.0" />
     <property name="opencv_lib" value="${opencv_home}/build/lib" />
 
     <property name="opencv" value="${opencv_home}/build/bin/opencv-300.jar" />
     <property name="javafx" value="/usr/lib/jvm/jfxrt.jar" />
-    <property name="junit" value="${basedir}/lib/junit.jar" />
-    <property name="jssc" value="${basedir}/lib/jssc-2.8.0.jar" />
+    <property name="junit" value="lib/junit.jar" />
+    <property name="jssc" value="lib/jssc-2.8.0.jar" />
 
     <path id="jars">
         <pathelement path="${opencv}" />
