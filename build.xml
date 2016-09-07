@@ -20,6 +20,8 @@
     <property name="junit" value="lib/junit.jar" />
     <property name="jssc" value="lib/jssc-2.8.0.jar" />
 
+    <property name="camera" value="0" /> <!-- -Dcamera=X corresponds to /dev/videoX -->
+
     <path id="jars">
         <pathelement path="${opencv}" />
         <pathelement path="${javafx}" />
@@ -59,6 +61,7 @@
     <target name="configure-camera">
         <exec executable="/bin/bash">
             <arg value="setup-camera.sh" />
+            <arg value="-d ${camera}" />
         </exec>
     </target>
 
