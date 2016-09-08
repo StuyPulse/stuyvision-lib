@@ -1,9 +1,9 @@
-package vision;
+package pulsevision.capture;
 
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
-import util.FileManager;
+import pulsevision.util.FileManager;
 
 public class ImageCaptureSource extends CaptureSource {
 

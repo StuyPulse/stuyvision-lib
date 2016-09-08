@@ -1,4 +1,4 @@
-<project name="stuy-vision-2016" default="compile-and-run-tegra" basedir=".">
+<project name="stuy-vision-2016" default="dist" basedir=".">
     <!--
         Before running for the first time, run the following (but
         use two dashes):
@@ -9,8 +9,10 @@
         jfxrt.jar file came from <JRE_HOME>/lib/ext/jfxrt.jar on a
         Windows machine
     -->
+    <property name="projectName" value="pulsevision" />
     <property name="srcdir" value="src" />
     <property name="bindir" value="bin" />
+    <property name="distdir" value="dist" />
 
     <property name="opencv_home" value="lib/opencv-3.0.0" />
     <property name="opencv_lib" value="${opencv_home}/build/lib" />
@@ -30,34 +32,6 @@
         <pathelement path="${jssc}" />
     </path>
 
-    <target name="compile-and-run-tegra" depends="compile, run-tegra" />
-
-    <target name="compile-and-run-gui" depends="compile, run-gui" />
-
-    <target name="run-tegra" depends="configure-camera">
-        <java classname="modules.StuyVisionModule"
-            classpathref="jars"
-            dir="${bindir}"
-            failonerror="true"
-            fork="true">
-            <!-- fork="true" ensures ant looks at working directory. Without
-                this, System.loadLibrary cannot find opencv in java.library.path -->
-            <sysproperty key="java.library.path" path="${opencv_lib}" />
-        </java>
-    </target>
-
-    <target name="run-gui" depends="configure-camera">
-        <java classname="gui.Main"
-            classpathref="jars"
-            dir="${bindir}"
-            failonerror="true"
-            fork="true">
-            <!-- fork="true" ensures ant looks at working directory. Without
-                this, System.loadLibrary cannot find opencv in java.library.path -->
-            <sysproperty key="java.library.path" path="${opencv_lib}" />
-        </java>
-    </target>
-
     <target name="configure-camera">
         <exec executable="/bin/bash">
             <arg value="setup-camera.sh" />
@@ -65,7 +39,12 @@
         </exec>
     </target>
 
-    <target name="compile" depends="init">
+    <target name="dist" depends="compile, init-dist">
+        <mkdir dir="${distdir}" />
+        <jar jarfile="${distdir}/${projectName}.jar" basedir="${bindir}" />
+    </target>
+
+    <target name="compile" depends="init-bin">
         <javac srcdir="${srcdir}"
             destdir="bin"
             source="1.8"
@@ -81,8 +60,18 @@
         </copy>
     </target>
 
-    <target name="init">
-        <delete dir="bin" />
-        <mkdir dir="bin" />
+    <target name="init-dist">
+        <delete dir="${distdir}" />
+        <mkdir dir="${distdir}" />
+    </target>
+
+    <target name="init-bin">
+        <delete dir="${bindir}" />
+        <mkdir dir="${bindir}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${bindir}" />
+        <delete dir="${distdir}" />
     </target>
 </project>

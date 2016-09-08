@@ -1,19 +1,23 @@
-package vision;
+package pulsevision.capture;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
-public class DeviceCaptureSource extends CaptureSource {
 
-    private final int deviceNo;
+import pulsevision.util.FileManager;
+
+public class VideoCaptureSource extends CaptureSource {
+
+    private final String filename;
     private VideoCapture capture = null;
 
-    public DeviceCaptureSource(int device) {
-        this.deviceNo = device;
+    public VideoCaptureSource(String filename) {
+        FileManager.assertFileExists(filename);
+        this.filename = filename;
         reinitializeCaptureSource();
     }
 
-    public DeviceCaptureSource(int device, int maxDimension) {
-        this(device);
+    public VideoCaptureSource(String filename, int maxDimension) {
+        this(filename);
         setMaxImageDimension(maxDimension);
     }
 
@@ -22,7 +26,7 @@ public class DeviceCaptureSource extends CaptureSource {
         if (capture != null) {
             capture.release();
         }
-        capture = new VideoCapture(deviceNo);
+        capture = new VideoCapture(filename);
     }
 
     @Override
@@ -35,11 +39,4 @@ public class DeviceCaptureSource extends CaptureSource {
         return capture.read(mat);
     }
 
-    public void setExposure(int value) {
-        capture.set(15, value);
-    }
-
-    public void setBrightness(int value) {
-        capture.set(10, value);
-    }
 }

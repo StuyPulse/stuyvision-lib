@@ -1,12 +1,14 @@
-package vision;
+package pulsevision.gui;
 
 import java.util.ArrayList;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
-import gui.Main;
-import util.DebugPrinter;
+import pulsevision.VisionModule;
+//import pulsevision.VisionGui;
+import pulsevision.capture.CaptureSource;
+import pulsevision.util.DebugPrinter;
 
 public class ModuleRunner {
     private static ArrayList<CaptureSourceToVisionModuleMapper> sourceDestMap = new ArrayList<CaptureSourceToVisionModuleMapper>();
@@ -19,11 +21,11 @@ public class ModuleRunner {
         DebugPrinter.println("System.loadLibrary succeeded");
     }
 
-    public static void addMapping(CaptureSource captureSource, VisionModule... modules) {
+    public void addMapping(CaptureSource captureSource, VisionModule... modules) {
         sourceDestMap.add(new CaptureSourceToVisionModuleMapper(captureSource, modules));
     }
 
-    public void run(Main app) {
+    void run(VisionGui app) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -38,8 +40,7 @@ public class ModuleRunner {
                                 // reliably work.
                                 captureSourceMap.captureSource.reinitializeCaptureSource();
                                 DebugPrinter.println("Looping capture source");
-                            }
-                            else {
+                            } else {
                                 for (VisionModule module : captureSourceMap.modules) {
                                     Thread t = new Thread(new Runnable() {
                                         @Override
@@ -58,8 +59,7 @@ public class ModuleRunner {
                     }
                     try {
                         Thread.sleep(1000 / FPS);
-                    }
-                    catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         break;
                     }
                 }
@@ -68,7 +68,7 @@ public class ModuleRunner {
         t.start();
     }
 
-    public ArrayList<VisionModule> getModules() {
+    ArrayList<VisionModule> getModules() {
         ArrayList<VisionModule> modules = new ArrayList<VisionModule>();
         for (CaptureSourceToVisionModuleMapper map : sourceDestMap) {
             for (VisionModule module : map.modules) {

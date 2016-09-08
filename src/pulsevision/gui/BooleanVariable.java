@@ -1,4 +1,4 @@
-package gui;
+package pulsevision.gui;
 
 public class BooleanVariable extends Variable {
 

@@ -8,12 +8,15 @@ lib/opencv-*
 doc/
 bin/
 build/
+dist/
 
 # Text Backup Files #
 *.sw[a-z]
 *~
 \#*\#
 .\#*
+
+Session.vim
 
 # OS X Files #
 .DS_Store

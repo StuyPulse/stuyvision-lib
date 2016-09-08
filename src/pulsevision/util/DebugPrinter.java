@@ -1,4 +1,4 @@
-package util;
+package pulsevision.util;
 
 public class DebugPrinter {
 

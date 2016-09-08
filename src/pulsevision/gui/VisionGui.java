@@ -1,6 +1,7 @@
-package gui;
+package pulsevision.gui;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.opencv.core.Core;
@@ -23,17 +24,19 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import modules.VisionModuleSuite;
-import vision.ModuleRunner;
-import vision.VisionModule;
-import util.DebugPrinter;
+import pulsevision.gui.ModuleRunner;
+import pulsevision.VisionModule;
+//import pulsevision.gui.ImageViewer;
+//import pulsevision.gui.ControlsController;
+import pulsevision.util.DebugPrinter;
 
-public class Main extends Application {
+public class VisionGui extends Application {
     private TabPane root;
     private Scene scene;
     private HashMap<Integer, ControlsController> tabs = new HashMap<Integer, ControlsController>();
-    private ModuleRunner moduleRunner = new ModuleRunner();
     private HashMap<String, ImageFrame> images = new HashMap<String, ImageFrame>();
+
+    private static ModuleRunner moduleRunner;
 
     static {
         DebugPrinter.println("Loading OpenCV version " + Core.VERSION);
@@ -49,8 +52,6 @@ public class Main extends Application {
             root = loader.load();
             scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("css/main.css").toString());
-            // Initialize ModuleRunner with VisionModuleSuite
-            new VisionModuleSuite();
             for (VisionModule module : moduleRunner.getModules()) {
                 FXMLLoader tabLoader = new FXMLLoader(getClass().getResource("fxml/module_main.fxml"));
                 final SplitPane moduleContainer = tabLoader.load();
@@ -59,15 +60,15 @@ public class Main extends Application {
                 tabs.put(module.hashCode(), controlsController);
                 root.getTabs().add(new Tab(module.getName(), moduleContainer));
             }
-            moduleRunner.run(this);
-            primaryStage.setOnCloseRequest((event) -> quit());
-            primaryStage.setTitle("Java Vision GUI");
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        }
-        catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
+        primaryStage.setOnCloseRequest((event) -> quit());
+        primaryStage.setTitle("Java Vision GUI");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        moduleRunner.run(this);
     }
 
     private void quit() {
@@ -112,7 +113,8 @@ public class Main extends Application {
         }
     }
 
-    public static void main(String[] args) {
+    public static void begin(String[] args, ModuleRunner runner) {
+        moduleRunner = runner;
         launch(args);
     }
 
