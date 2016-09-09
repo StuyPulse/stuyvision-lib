@@ -83,11 +83,10 @@ public class StuyVisionModule extends VisionModule {
     }
 
     // For running as a JavaFX gui
-    public Object run(Main app, Mat frame) {
-        app.postImage(frame, "Camera", this);
-        double[] vectorToGoal = hsvThresholding(frame, app);
+    public void run(Mat frame) {
+        postImage(frame, "Camera");
+        double[] vectorToGoal = hsvThresholding(frame);
         printVectorInfo(vectorToGoal, logWriter);
-        return vectorToGoal;
     }
 
     /**
@@ -103,8 +102,8 @@ public class StuyVisionModule extends VisionModule {
                 || (1 / maxRatioThreshold.value() < ratio && ratio < 1 / minRatioThreshold.value());
     }
 
-    private double[] getLargestGoal(Mat originalFrame, Mat filteredImage, Main app) {
-        boolean withGui = app != null;
+    private double[] getLargestGoal(Mat originalFrame, Mat filteredImage) {
+        boolean withGui = hasMainApp();
         Mat drawn = null;
         if (withGui) {
             // `drawn` will be the original image with info about what was
@@ -144,7 +143,7 @@ public class StuyVisionModule extends VisionModule {
         if (largestRect == null) {
             if (withGui) {
                 // Post the unchanged image anyway for visual consistency
-                app.postImage(originalFrame, "Goals", this);
+                postImage(originalFrame, "Goals");
             }
             // Return null to signify no goal found
             return null;
@@ -174,21 +173,18 @@ public class StuyVisionModule extends VisionModule {
             textPos.y += 20;
             Imgproc.putText(drawn, "Y: " + Math.round(vector[1]), textPos, 0, 0.6, new Scalar(0, 0, 255));
 
-            app.postImage(drawn, "Goals", this);
+            postImage(drawn, "Goals");
         }
 
         return vector;
     }
 
     /**
-     * Process an image to look for a goal, and, if a <code>app</code> is
-     * passed, post two intermediate states of the image from during
-     * processing to the gui
+     * Process an image to look for a goal, and, if this VisionModule was
+     * passed to a Main app post intermediate states of the image from
+     * during processing to the gui
 
      * @param frame The image to process
-
-     * @param app (Optional: pass <code>null</code> to ignore) The
-     * <code>Main</code> to post intermediate states of the processed image to.
 
      * @return Three doubles, in a <code>double[3]</code>, ordered as such:
      * <p><code>index 0</code>: The x-offset, in pixels, of the center of the
@@ -198,9 +194,10 @@ public class StuyVisionModule extends VisionModule {
      * <p><code>index 2</code>: The angle at which the bounding rectangle is
      * tilted
      */
-    public double[] hsvThresholding(Mat frame, Main app) {
-        // If `app` is null, we will not try to post images to it
-        boolean withGui = app != null;
+    public double[] hsvThresholding(Mat frame) {
+        // If and only if there is a gui.Main associated with this
+        // StuyVisionModule, we will post images to it
+        boolean withGui = hasMainApp();
 
         // Convert BGR camera image to HSV for processing
         Mat hsv = new Mat();
@@ -221,7 +218,7 @@ public class StuyVisionModule extends VisionModule {
         Core.bitwise_and(greenFilterChannels.get(0), greenFilterChannels.get(1), greenFiltered);
         Core.bitwise_and(greenFilterChannels.get(2), greenFiltered, greenFiltered);
         if (withGui) {
-            app.postImage(greenFiltered, "After filtering H, S, V; before erode/dilate", this);
+            postImage(greenFiltered, "After filtering H, S, V; before erode/dilate");
         }
 
         // Erode and dilate to remove noise
@@ -230,26 +227,15 @@ public class StuyVisionModule extends VisionModule {
         Imgproc.erode(greenFiltered, greenFiltered, erodeKernel);
         Imgproc.dilate(greenFiltered, greenFiltered, dilateKernel);
         if (withGui) {
-            app.postImage(greenFiltered, "After erode/dilate", this);
+            postImage(greenFiltered, "After erode/dilate");
         }
 
-        double[] output = getLargestGoal(frame, greenFiltered, app);
+        double[] output = getLargestGoal(frame, greenFiltered);
         try {
             logWriter.println("Vector calculated: " + Arrays.toString(output));
             logWriter.flush();
         } catch (Exception e) {}
         return output;
-    }
-
-    /**
-     * Call hsvThresholding with <code>null</code> for the <code>app</code>, to
-     * process an image without using a gui.
-     * See doc for <code>hsvThresholding(Mat, Main)</code> for detail.
-     * @param frame Image to process
-     * @return
-     */
-    public double[] hsvThresholding(Mat frame) {
-        return hsvThresholding(frame, null);
     }
 
     /**
