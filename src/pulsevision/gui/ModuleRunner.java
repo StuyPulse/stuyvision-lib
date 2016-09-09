@@ -25,7 +25,7 @@ public class ModuleRunner {
         sourceDestMap.add(new CaptureSourceToVisionModuleMapper(captureSource, modules));
     }
 
-    void run(VisionGui app) {
+    public void run() {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -46,7 +46,7 @@ public class ModuleRunner {
                                         @Override
                                         public void run() {
                                             long start = System.currentTimeMillis();
-                                            module.run(app, frame);
+                                            module.run(frame);
                                             long duration = System.currentTimeMillis() - start;
                                             //DebugPrinter.println(module.getName() + ": " + duration + " ms");
                                         }
@@ -68,7 +68,7 @@ public class ModuleRunner {
         t.start();
     }
 
-    ArrayList<VisionModule> getModules() {
+    public ArrayList<VisionModule> getModules() {
         ArrayList<VisionModule> modules = new ArrayList<VisionModule>();
         for (CaptureSourceToVisionModuleMapper map : sourceDestMap) {
             for (VisionModule module : map.modules) {

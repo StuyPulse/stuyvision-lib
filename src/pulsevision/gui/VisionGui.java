@@ -53,6 +53,7 @@ public class VisionGui extends Application {
             scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("css/main.css").toString());
             for (VisionModule module : moduleRunner.getModules()) {
+                module.setGuiApp(this);
                 FXMLLoader tabLoader = new FXMLLoader(getClass().getResource("fxml/module_main.fxml"));
                 final SplitPane moduleContainer = tabLoader.load();
                 ControlsController controlsController = tabLoader.getController();
@@ -66,9 +67,11 @@ public class VisionGui extends Application {
         }
         primaryStage.setOnCloseRequest((event) -> quit());
         primaryStage.setTitle("Java Vision GUI");
+        primaryStage.setMinWidth(root.getMinWidth());
+        primaryStage.setMinHeight(root.getMinHeight());
         primaryStage.setScene(scene);
         primaryStage.show();
-        moduleRunner.run(this);
+        moduleRunner.run();
     }
 
     private void quit() {
@@ -76,6 +79,12 @@ public class VisionGui extends Application {
         System.exit(0);
     }
 
+    /**
+     * Posts an image to the GUI under the given {@code imageLabel}
+     * @param m the Mat containing the image
+     * @param label a unique label for this image
+     * @param requester the VisionModule calling this method
+     */
     public synchronized void postImage(Mat m, String label, VisionModule requester) {
         String key = requester.hashCode() + label;
         // Convert raw image to PNG
@@ -90,8 +99,10 @@ public class VisionGui extends Application {
             ImageView imageView = new ImageView(image);
             Text text = new Text(label);
             text.getStyleClass().add("image-label");
-            container.getChildren().addAll(imageView, text);
-            images.put(key, new ImageFrame(imageView, text));
+            VBox tagContainer = new VBox();
+            tagContainer.setAlignment(Pos.CENTER);
+            container.getChildren().addAll(imageView, text, tagContainer);
+            images.put(key, new ImageFrame(imageView, text, tagContainer));
             Platform.runLater(() -> {
                 tabs.get(requester.hashCode()).flowPane.getChildren().add(container);
             });
@@ -107,10 +118,26 @@ public class VisionGui extends Application {
             // Update the existing ImageFrame
             Platform.runLater(() -> {
                 existingFrame.imageView.setImage(image);
-                existingFrame.imageView.toFront();
-                existingFrame.label.toFront();
             });
         }
+    }
+
+    /**
+     * Posts an image tag (arbitrary text) to the GUI under the given {@code imageLabel}
+     * @param imageLabel the label of the image to which to add a tag
+     * @param tagKey a unique key for this tag
+     * @param tagValue the value to display for this tag
+     * @param requester the VisionModule calling this method
+     * @return true if a tag was successfully posted, false otherwise
+     */
+    public synchronized boolean postTag(String imageLabel, String tagKey, String tagValue, VisionModule requester) {
+        String key = requester.hashCode() + imageLabel;
+        ImageFrame existingFrame = images.get(key);
+        if (existingFrame != null) {
+            existingFrame.addTag(tagKey, tagValue);
+            return true;
+        }
+        return false;
     }
 
     public static void begin(String[] args, ModuleRunner runner) {
@@ -121,10 +148,29 @@ public class VisionGui extends Application {
     private class ImageFrame {
         private ImageView imageView;
         private Text label;
+        private VBox tagContainer;
+        private HashMap<String, Text> tags;
 
-        public ImageFrame(ImageView imageView, Text label) {
+        private ImageFrame(ImageView imageView, Text label, VBox tagContainer) {
             this.imageView = imageView;
             this.label = label;
+            this.tagContainer = tagContainer;
+            this.tags = new HashMap<String, Text>();
+        }
+
+        private synchronized void addTag(String key, String value) {
+            Text existingTag = tags.get(key);
+            if (existingTag != null) {
+                existingTag.setText(value);
+            }
+            else {
+                Text newTag = new Text(value);
+                newTag.getStyleClass().add("image-tag");
+                tags.put(key, newTag);
+                Platform.runLater(() -> {
+                    tagContainer.getChildren().add(newTag);
+                });
+            }
         }
     }
 }
