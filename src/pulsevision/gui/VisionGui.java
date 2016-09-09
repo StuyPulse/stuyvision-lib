@@ -26,8 +26,6 @@ import javafx.stage.Stage;
 
 import pulsevision.gui.ModuleRunner;
 import pulsevision.VisionModule;
-//import pulsevision.gui.ImageViewer;
-//import pulsevision.gui.ControlsController;
 import pulsevision.util.DebugPrinter;
 
 public class VisionGui extends Application {

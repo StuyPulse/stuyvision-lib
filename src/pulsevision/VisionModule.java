@@ -6,6 +6,8 @@ import pulsevision.gui.VisionGui;
 
 public abstract class VisionModule {
 
+    // `app` remains null when the VisionModule instance will not
+    // be used with the VisionGui GUI.
     private VisionGui app = null;
 
     /**
