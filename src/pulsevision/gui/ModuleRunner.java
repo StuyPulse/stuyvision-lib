@@ -47,7 +47,7 @@ public class ModuleRunner {
                                             long start = System.currentTimeMillis();
                                             module.run(frame);
                                             long duration = System.currentTimeMillis() - start;
-                                            //DebugPrinter.println(module.getName() + ": " + duration + " ms");
+                                            DebugPrinter.println(module.getName() + " ran in " + duration + " ms");
                                         }
                                     }, module.getName() + " Thread");
                                     t.setDaemon(true);
