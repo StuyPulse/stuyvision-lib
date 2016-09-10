@@ -1,13 +1,13 @@
-package pulsevision.gui;
+package stuyvision.gui;
 
 import java.util.ArrayList;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
-import pulsevision.VisionModule;
-import pulsevision.capture.CaptureSource;
-import pulsevision.util.DebugPrinter;
+import stuyvision.VisionModule;
+import stuyvision.capture.CaptureSource;
+import stuyvision.util.DebugPrinter;
 
 public class ModuleRunner {
     private static ArrayList<CaptureSourceToVisionModuleMapper> sourceDestMap = new ArrayList<CaptureSourceToVisionModuleMapper>();

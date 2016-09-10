@@ -1,9 +1,9 @@
-package pulsevision.capture;
+package stuyvision.capture;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
-import pulsevision.util.FileManager;
+import stuyvision.util.FileManager;
 
 public class VideoCaptureSource extends CaptureSource {
 

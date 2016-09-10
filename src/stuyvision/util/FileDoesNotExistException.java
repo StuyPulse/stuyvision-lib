@@ -1,4 +1,4 @@
-package pulsevision.util;
+package stuyvision.util;
 
 public class FileDoesNotExistException extends RuntimeException {
 

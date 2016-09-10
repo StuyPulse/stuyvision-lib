@@ -1,4 +1,4 @@
-package pulsevision.gui;
+package stuyvision.gui;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -16,8 +16,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import pulsevision.util.DebugPrinter;
-import pulsevision.VisionModule;
+import stuyvision.util.DebugPrinter;
+import stuyvision.VisionModule;
 
 public class ControlsController {
 

@@ -1,4 +1,4 @@
-<project name="stuy-vision-2016" default="dist" basedir=".">
+<project name="stuyvision" default="dist" basedir=".">
     <!--
         Before running for the first time, run the following (but
         use two dashes):
@@ -9,7 +9,7 @@
         jfxrt.jar file came from <JRE_HOME>/lib/ext/jfxrt.jar on a
         Windows machine
     -->
-    <property name="projectName" value="pulsevision" />
+    <property name="projectName" value="stuyvision" />
     <property name="srcdir" value="src" />
     <property name="bindir" value="bin" />
     <property name="distdir" value="dist" />

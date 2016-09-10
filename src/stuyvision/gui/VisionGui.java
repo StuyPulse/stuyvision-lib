@@ -1,4 +1,4 @@
-package pulsevision.gui;
+package stuyvision.gui;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,9 +24,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import pulsevision.gui.ModuleRunner;
-import pulsevision.VisionModule;
-import pulsevision.util.DebugPrinter;
+import stuyvision.gui.ModuleRunner;
+import stuyvision.VisionModule;
+import stuyvision.util.DebugPrinter;
 
 public class VisionGui extends Application {
     private TabPane root;

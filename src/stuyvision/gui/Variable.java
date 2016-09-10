@@ -1,4 +1,4 @@
-package pulsevision.gui;
+package stuyvision.gui;
 
 public abstract class Variable {
 

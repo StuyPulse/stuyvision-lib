@@ -1,8 +1,8 @@
-package pulsevision;
+package stuyvision;
 
 import org.opencv.core.Mat;
 
-import pulsevision.gui.VisionGui;
+import stuyvision.gui.VisionGui;
 
 public abstract class VisionModule {
 

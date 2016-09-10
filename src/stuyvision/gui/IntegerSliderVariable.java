@@ -1,4 +1,4 @@
-package pulsevision.gui;
+package stuyvision.gui;
 
 public class IntegerSliderVariable extends Variable implements NumberVariable {
 

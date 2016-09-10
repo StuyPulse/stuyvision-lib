@@ -1,4 +1,4 @@
-package pulsevision.capture;
+package stuyvision.capture;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;

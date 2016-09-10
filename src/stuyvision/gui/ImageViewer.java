@@ -1,4 +1,4 @@
-package pulsevision.gui;
+package stuyvision.gui;
 
 import java.util.HashMap;
 
