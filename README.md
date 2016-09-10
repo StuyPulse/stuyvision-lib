@@ -32,7 +32,7 @@ Then run:
 $ ./install-opencv-unix.sh
 ```
 
-## To build with Ant
+## Building with Ant
 Make sure you have Apache Ant installed. You can check
 by running `ant -version`.
 
@@ -89,7 +89,6 @@ sudo ln -s /path/to/script S80run-cv
 ```
 
 An example startup script can be seen [here](https://github.com/Team694/stuy-vision-2016/blob/master/run-cv.sh).
-Note that in this case, the ant script invoked ran a script like `setup-camera.sh`.
 
 In order to set runlevel 4 as the default runlevel, open
 `/etc/init/rc-sysinit.conf`
