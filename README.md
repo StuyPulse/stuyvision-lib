@@ -1,11 +1,10 @@
 Stuy Vision 2016
 ================
 
-This is our CV project for FRC 2016: Stronghold.
+A library for interactive computer vision development, forked from a
+[project](https://github.com/ChesleyTan/java-vision-gui) by two StuyPulse alumni.
 
-Forked and made using an alumni's project, inspired by [CUAUV](https://github.com/cuauv)'s auv-vision-gui
-
-## Setting Up
+## Installing OpenCV on your machine
 
 If JAVA_HOME is not set, set it with
 
@@ -33,32 +32,25 @@ Then run:
 $ ./install-opencv-unix.sh
 ```
 
-### To use with eclipse
+## To build with Ant
+Make sure you have Apache Ant installed. You can check
+by running `ant -version`.
 
-After OpenCV builds, update the Eclipse classpath:
+Run
 
 ```
-$ cp .classpath-generic .classpath     # Generic JRE
-
-OR
-
-$ cp .classpath-osx .classpath         # OSX JRE-1.8 u65
+$ ant dist
 ```
 
-### To build/run with ant
-`ant compile` builds the project.
+to build the project and create `dist/stuyvision.jar`.
 
-`ant run-tegra` runs the Tegra target (modules.StuyVisionModule.main) (starting
-the Tegra server).  `ant compile-and-run-tegra`, or simply `ant`, compiles then
-runs for the tegra.
+## Configuring camera settings
 
-`ant run-gui` runs the GUI (gui.Main.main). `ant compile-and-run-gui` compiles
-then runs the GUI.
+`setup-camera.sh` uses V4L (Video4Linux) to configure settings
+like exposure and brightness (which should be installed
+if you followed the OpenCV installation directions above).
 
-Make sure `jfxrt.jar` is in the right place. `build.xml` expects it at
-`/usr/lib/jvm/jfxrt.jar`.
-
-## Setting Up on a NVIDIA Jetson
+## Setting up CV on a NVIDIA Jetson (Tegra)
 
 To install OpenCV 3.0, run:
 
@@ -66,19 +58,44 @@ To install OpenCV 3.0, run:
 $ ./install-opencv-tegra.sh
 ```
 
-To set up the runlevel and run the cv on boot, modify `/etc/init/rc-sysinit.conf` to use runlevel 4, which you will then modify
+Again, make sure to install the dependencies.
 
-Find the line `env DEFAULT_RUNLEVEL=2`, and change it to
-```
-env DEFAULT_RUNLEVEL=4
-```
+### Running your code on startup
+
+To run your code automatically when the Tegra boots, you'll set up a
+runlevel. Most Linux machines have 7 runlevels, numbered 0 through 6,
+in which 0 shuts down the system, 6 reboots, and 1 through 5 startup
+the machine in various different ways. You can read more about runlevels
+[here](https://en.wikipedia.org/wiki/Runlevel) and
+runlevels in Debian in particular [here](https://wiki.debian.org/RunLevel).
+
+We will show setup of runlevel 4, a runlevel open for customization in Debian
+and LSB (Linux Standard Base)-compliant distributions.
 
 What will run in runlevel 4 is determined by the contents of `/etc/rc4.d/`.
-`rc4.d` contains symbolic links to the scripts that will run when booting to this run level.
-Add a symbolic link to a script whose name starts with `S`, followed by a two-digit number,
-and then a descriptive name. The two-digit number determines the order in which the scripts will run.
+`rc4.d` contains symbolic links to the scripts that will run when booting to
+this run level.
+
+Add a symbolic link to the script which will begin execution of your code.
+Give it a name beginning with `S`, followed by a two-digit number,
+and then a descriptive name. The two-digit number determines the order in
+which the scripts will run.
+
+E.g.:
 
 ```
 cd /etc/rc4.d/
 sudo ln -s /path/to/script S80run-cv
+```
+
+An example startup script can be seen [here](https://github.com/Team694/stuy-vision-2016/blob/master/run-cv.sh).
+Note that in this case, the ant script invoked ran a script like `setup-camera.sh`.
+
+In order to set runlevel 4 as the default runlevel, open
+`/etc/init/rc-sysinit.conf`
+
+Find the line `env DEFAULT_RUNLEVEL=2`, and change it to
+
+```
+env DEFAULT_RUNLEVEL=4
 ```
