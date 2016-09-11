@@ -18,18 +18,14 @@
     <property name="opencv_lib" value="${opencv_home}/build/lib" />
 
     <property name="opencv" value="${opencv_home}/build/bin/opencv-300.jar" />
-    <property name="javafx" value="/usr/lib/jvm/jfxrt.jar" />
-    <property name="junit" value="lib/junit.jar" />
-    <property name="jssc" value="lib/jssc-2.8.0.jar" />
+    <property name="javafx" value="lib/jfxrt.jar" />
 
     <property name="camera" value="0" /> <!-- -Dcamera=X corresponds to /dev/videoX -->
 
     <path id="jars">
         <pathelement path="${opencv}" />
         <pathelement path="${javafx}" />
-        <pathelement path="${junit}" />
         <pathelement path="${bindir}" />
-        <pathelement path="${jssc}" />
     </path>
 
     <target name="configure-camera">

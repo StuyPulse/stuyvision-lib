@@ -36,13 +36,19 @@ $ ./install-opencv-unix.sh
 Make sure you have Apache Ant installed. You can check
 by running `ant -version`.
 
-Run
+Run `ant dist`, or just
 
 ```
-$ ant dist
+$ ant
 ```
 
 to build the project and create `dist/stuyvision.jar`.
+
+If javac canot find the `javafx` package,
+you may be using an OpenJDK that does not include JavaFX. The
+needed jar can be found at `<JRE_HOME>/lib/ext/jfxrt.jar` in
+an Oracle JDK. Copy this to `lib/jfxrt.jar` or make a symbolic
+link.
 
 ## Configuring camera settings
 
