@@ -24,7 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import stuyvision.gui.ModuleRunner;
+import stuyvision.ModuleRunner;
 import stuyvision.VisionModule;
 import stuyvision.util.DebugPrinter;
 

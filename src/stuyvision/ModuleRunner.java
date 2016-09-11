@@ -1,4 +1,4 @@
-package stuyvision.gui;
+package stuyvision;
 
 import java.util.ArrayList;
 
