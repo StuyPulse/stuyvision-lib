@@ -40,12 +40,20 @@ public class ModuleRunner {
                                 captureSourceMap.captureSource.reinitializeCaptureSource();
                                 DebugPrinter.println("Looping capture source");
                             } else {
-                                for (VisionModule module : captureSourceMap.modules) {
+                                for (int i = 0; i < captureSourceMap.modules.length; i++) {
+                                    VisionModule module = captureSourceMap.modules[i];
+
+                                    // Unless this is the last module, clone the frame, so
+                                    // that modules can mutate the frame they are given.
+                                    Mat uniqueFrame = i == captureSourceMap.modules.length - 1
+                                        ? frame
+                                        : frame.clone();
+
                                     Thread t = new Thread(new Runnable() {
                                         @Override
                                         public void run() {
                                             long start = System.currentTimeMillis();
-                                            module.run(frame);
+                                            module.run(uniqueFrame);
                                             long duration = System.currentTimeMillis() - start;
                                             DebugPrinter.println(module.getName() + " ran in " + duration + " ms");
                                         }
