@@ -9,7 +9,7 @@ public abstract class CaptureSource {
     // To resize all frames to have, e.g., a width of 360px,
     // or a maximum dimension of some number of pixels.
     // See javadocs on methods such as readSized below.
-    private ResizeDimension resizeDimension = ResizeDimension.maxDimension;
+    private ResizeDimension resizeDimension = ResizeDimension.width;
     private int resizeLength = 360;
 
     public abstract void reinitializeCaptureSource();
