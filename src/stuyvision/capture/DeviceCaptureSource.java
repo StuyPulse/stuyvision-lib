@@ -6,24 +6,16 @@ import org.opencv.videoio.VideoCapture;
 public class DeviceCaptureSource extends CaptureSource {
 
     private final int deviceNo;
-    private VideoCapture capture = null;
+    private VideoCapture capture;
 
     public DeviceCaptureSource(int device) {
         this.deviceNo = device;
-        reinitializeCaptureSource();
+        capture = new VideoCapture(device);
     }
 
     public DeviceCaptureSource(int device, CaptureSource.ResizeDimension dim, int length) {
         this(device);
         resizeDimensionTo(dim, length);
-    }
-
-    @Override
-    public void reinitializeCaptureSource() {
-        if (capture != null) {
-            capture.release();
-        }
-        capture = new VideoCapture(deviceNo);
     }
 
     @Override

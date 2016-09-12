@@ -7,6 +7,7 @@ import org.opencv.core.Mat;
 
 import stuyvision.VisionModule;
 import stuyvision.capture.CaptureSource;
+import stuyvision.capture.Loopable;
 import stuyvision.util.DebugPrinter;
 
 public class ModuleRunner {
@@ -34,12 +35,14 @@ public class ModuleRunner {
                             Mat frame = new Mat();
                             boolean success = captureSourceMap.captureSource.readSized(frame, frame);
                             if (!success) {
-                                // FIXME: We're reinitializing the capture source so we can loop it when we've reached
-                                // the end of the stream. The proper method would be to set the frame pointer for the
-                                // source to point back to the beginning of the stream, but this method does not
-                                // reliably work.
-                                captureSourceMap.captureSource.reinitializeCaptureSource();
-                                DebugPrinter.println("Looping capture source");
+                                if (captureSourceMap.captureSource instanceof Loopable) {
+                                    ((Loopable) captureSourceMap.captureSource).loop();
+                                    DebugPrinter.println("Looping capture source");
+                                } else {
+                                    DebugPrinter.println(
+                                            "Failed to read frame from CaptureSource "
+                                            + captureSourceMap.captureSource);
+                                }
                             } else {
                                 for (int i = 0; i < captureSourceMap.modules.length; i++) {
                                     VisionModule module = captureSourceMap.modules[i];

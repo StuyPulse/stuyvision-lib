@@ -12,8 +12,6 @@ public abstract class CaptureSource {
     private ResizeDimension resizeDimension = ResizeDimension.width;
     private int resizeLength = 360;
 
-    public abstract void reinitializeCaptureSource();
-
     public abstract boolean isOpened();
 
     /**

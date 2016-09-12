@@ -8,22 +8,17 @@ import stuyvision.util.FileManager;
 public class ImageCaptureSource extends CaptureSource {
 
     private final String filename;
-    private Mat mat = null;
+    private Mat mat;
 
     public ImageCaptureSource(String filename) {
         FileManager.assertFileExists(filename);
         this.filename = filename;
-        reinitializeCaptureSource();
+        mat = Imgcodecs.imread(filename);
     }
 
     public ImageCaptureSource(String filename, CaptureSource.ResizeDimension dim, int length) {
         this(filename);
         resizeDimensionTo(dim, length);
-    }
-
-    @Override
-    public void reinitializeCaptureSource() {
-        mat = Imgcodecs.imread(filename);
     }
 
     @Override

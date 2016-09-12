@@ -3,9 +3,12 @@ package stuyvision.capture;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
+import static org.opencv.videoio.Videoio.CAP_PROP_POS_FRAMES;
+
+import stuyvision.util.DebugPrinter;
 import stuyvision.util.FileManager;
 
-public class VideoCaptureSource extends CaptureSource {
+public class VideoCaptureSource extends CaptureSource implements Loopable {
 
     private final String filename;
     private VideoCapture capture = null;
@@ -21,7 +24,9 @@ public class VideoCaptureSource extends CaptureSource {
         resizeDimensionTo(dim, length);
     }
 
-    @Override
+    /**
+     * Reintialize the underlying VideoCapture.
+     */
     public void reinitializeCaptureSource() {
         if (capture != null) {
             capture.release();
@@ -37,6 +42,26 @@ public class VideoCaptureSource extends CaptureSource {
     @Override
     public boolean readFrame(Mat mat) {
         return capture.read(mat);
+    }
+
+    @Override
+    public boolean loop() {
+        if (capture == null) {
+            return false;
+        }
+        boolean success = capture.set(CAP_PROP_POS_FRAMES, 0);
+        // FIXME: Determine if OpenCV issue with setting CAP_PROP_POS_FRAMES
+        // on video formats with high compression is still relevant in 3.0.0.
+        // Relevant: code.opencv.org/issues/1419 , stackoverflow.com/a/36402322
+
+        if (!success) {
+            DebugPrinter.println(
+                    "VideoCaptureSource.loop: Setting VideoCapture frame "
+                    + "to first frame of video failed. Falling back on "
+                    + "reinitializeCaptureSource in order to loop");
+            reinitializeCaptureSource();
+        }
+        return true;
     }
 
 }
