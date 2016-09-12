@@ -31,8 +31,9 @@ public class ModuleRunner {
                 while (true) {
                     for (CaptureSourceToVisionModuleMapper captureSourceMap : sourceDestMap) {
                         if (captureSourceMap.captureSource.isOpened()) {
-                            Mat frame = captureSourceMap.captureSource.read();
-                            if (frame == null) {
+                            Mat frame = new Mat();
+                            boolean success = captureSourceMap.captureSource.readSized(frame, frame);
+                            if (!success) {
                                 // FIXME: We're reinitializing the capture source so we can loop it when we've reached
                                 // the end of the stream. The proper method would be to set the frame pointer for the
                                 // source to point back to the beginning of the stream, but this method does not

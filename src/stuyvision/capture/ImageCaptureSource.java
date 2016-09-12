@@ -16,9 +16,9 @@ public class ImageCaptureSource extends CaptureSource {
         reinitializeCaptureSource();
     }
 
-    public ImageCaptureSource(String filename, int maxDimension) {
+    public ImageCaptureSource(String filename, CaptureSource.ResizeDimension dim, int length) {
         this(filename);
-        setMaxImageDimension(maxDimension);
+        resizeDimensionTo(dim, length);
     }
 
     @Override

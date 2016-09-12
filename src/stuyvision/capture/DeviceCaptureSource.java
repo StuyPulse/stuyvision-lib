@@ -13,9 +13,9 @@ public class DeviceCaptureSource extends CaptureSource {
         reinitializeCaptureSource();
     }
 
-    public DeviceCaptureSource(int device, int maxDimension) {
+    public DeviceCaptureSource(int device, CaptureSource.ResizeDimension dim, int length) {
         this(device);
-        setMaxImageDimension(maxDimension);
+        resizeDimensionTo(dim, length);
     }
 
     @Override

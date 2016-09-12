@@ -16,9 +16,9 @@ public class VideoCaptureSource extends CaptureSource {
         reinitializeCaptureSource();
     }
 
-    public VideoCaptureSource(String filename, int maxDimension) {
+    public VideoCaptureSource(String filename, CaptureSource.ResizeDimension dim, int length) {
         this(filename);
-        setMaxImageDimension(maxDimension);
+        resizeDimensionTo(dim, length);
     }
 
     @Override
