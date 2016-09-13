@@ -11,8 +11,29 @@ import stuyvision.capture.Loopable;
 import stuyvision.util.DebugPrinter;
 
 public class ModuleRunner {
-    private static ArrayList<CaptureSourceToVisionModuleMapper> sourceDestMap = new ArrayList<CaptureSourceToVisionModuleMapper>();
-    private static final int FPS = 10;
+    private static final int DEFAULT_FPS = 10;
+
+    private ArrayList<CaptureSourceToVisionModuleMapper> sourceDestMap;
+    private int fps;
+
+    /**
+     * The framerate to be used by {@link #run()} defaults to
+     * {@value #DEFAULT_FPS}fps.
+     *
+     * @see #ModuleRunner(int fps) to specify a different framerate
+     */
+    public ModuleRunner() {
+        sourceDestMap = new ArrayList<CaptureSourceToVisionModuleMapper>();
+        fps = DEFAULT_FPS;
+    }
+
+    /**
+     * @param fps The framerate to be used by {@link #run()}
+     */
+    public ModuleRunner(int fps) {
+        sourceDestMap = new ArrayList<CaptureSourceToVisionModuleMapper>();
+        this.fps = fps;
+    }
 
     static {
         DebugPrinter.println("Loading OpenCV version " + Core.VERSION);
@@ -69,7 +90,7 @@ public class ModuleRunner {
                         }
                     }
                     try {
-                        Thread.sleep(1000 / FPS);
+                        Thread.sleep(1000 / fps);
                     } catch (InterruptedException e) {
                         break;
                     }
