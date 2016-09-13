@@ -10,6 +10,20 @@ import stuyvision.capture.CaptureSource;
 import stuyvision.capture.Loopable;
 import stuyvision.util.DebugPrinter;
 
+/**
+ * A {@code ModuleRunner} holds a set of mappings from one
+ * {@link stuyvision.capture.CaptureSource} to one or more {@link VisionModule}s.
+ *
+ * The {@code ModuleRunner} is run with {@code ModuleRunner.run()}, spawning
+ * a thread which executes the {@link stuyvision.VisionModule#run(Mat)} method
+ * on each {@code VisionModule}, passing a {@code Mat} read from the
+ * corresponding {@code CaptureSource}. It will loop
+ * {@link stuyvision.capture.Loopable} {@code CaptureSource}s once they fail to
+ * read a frame.
+ *
+ * @see stuyvision.gui.VisionGui
+ * @see stuyvision.gui.VisionGui#begin(String[], stuyvision.ModuleRunner)
+ */
 public class ModuleRunner {
     private static final int DEFAULT_FPS = 10;
 
