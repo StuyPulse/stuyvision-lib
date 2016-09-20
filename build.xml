@@ -10,9 +10,9 @@
         Windows machine
     -->
     <property name="projectName" value="stuyvision" />
-    <property name="srcdir" value="src" />
-    <property name="bindir" value="bin" />
-    <property name="distdir" value="dist" />
+    <property name="src.dir" value="src" />
+    <property name="build.dir" value="build" />
+    <property name="dist.dir" value="dist" />
 
     <property name="opencv_home" value="lib/opencv-3.0.0" />
     <property name="opencv_lib" value="${opencv_home}/build/lib" />
@@ -25,7 +25,7 @@
     <path id="jars">
         <pathelement path="${opencv}" />
         <pathelement path="${javafx}" />
-        <pathelement path="${bindir}" />
+        <pathelement path="${build.dir}" />
     </path>
 
     <target name="configure-camera">
@@ -36,20 +36,20 @@
     </target>
 
     <target name="dist" depends="compile, init-dist">
-        <mkdir dir="${distdir}" />
-        <jar jarfile="${distdir}/${projectName}.jar" basedir="${bindir}" />
+        <mkdir dir="${dist.dir}" />
+        <jar jarfile="${dist.dir}/${projectName}.jar" basedir="${build.dir}" />
     </target>
 
     <target name="compile" depends="init-bin">
-        <javac srcdir="${srcdir}"
-            destdir="bin"
+        <javac srcdir="${src.dir}"
+            destdir="${build.dir}"
             source="1.8"
             target="1.8"
             verbose="true"
             classpathref="jars"
             includeantruntime="false" />
-        <copy todir="${bindir}">
-            <fileset dir="${srcdir}">
+        <copy todir="${build.dir}">
+            <fileset dir="${src.dir}">
                 <include name="**/*.fxml" />
                 <include name="**/*.css" />
             </fileset>
@@ -57,17 +57,17 @@
     </target>
 
     <target name="init-dist">
-        <delete dir="${distdir}" />
-        <mkdir dir="${distdir}" />
+        <delete dir="${dist.dir}" />
+        <mkdir dir="${dist.dir}" />
     </target>
 
     <target name="init-bin">
-        <delete dir="${bindir}" />
-        <mkdir dir="${bindir}" />
+        <delete dir="${build.dir}" />
+        <mkdir dir="${build.dir}" />
     </target>
 
     <target name="clean">
-        <delete dir="${bindir}" />
-        <delete dir="${distdir}" />
+        <delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
     </target>
 </project>
