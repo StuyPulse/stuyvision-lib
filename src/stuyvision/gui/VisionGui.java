@@ -64,7 +64,7 @@ public class VisionGui extends Application {
             System.exit(1);
         }
         primaryStage.setOnCloseRequest((event) -> quit());
-        primaryStage.setTitle("Java Vision GUI");
+        primaryStage.setTitle("StuyVision GUI");
         primaryStage.setMinWidth(root.getMinWidth());
         primaryStage.setMinHeight(root.getMinHeight());
         primaryStage.setScene(scene);
