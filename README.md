@@ -18,13 +18,13 @@ And, while you're using the GUI:
 
 ## Installing OpenCV on your machine
 
-If JAVA_HOME is not set, set it with
+If `JAVA_HOME` is not set, set it with
 
 ```
 $ export JAVA_HOME=/path/to/jdk
 ```
 
-This should be in your ~/.bashrc or .profile to persist across
+This should be in your `~/.bashrc` or `.profile` to persist across
 reboots. (Do not include the dollar sign.)
 
 To install OpenCV 3.0, first update your packages:
