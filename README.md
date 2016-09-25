@@ -4,6 +4,18 @@ Stuy Vision 2016
 A library for interactive computer vision development, forked from a
 [project](https://github.com/ChesleyTan/java-vision-gui) by two StuyPulse alumni.
 
+## Features
+- Generically read frames from cameras, videos, and images with `CaptureSource`
+- Automatic resizing of capture source frames to desired size
+- Map `CaptureSource`s to `VisionModule`s to compare how algorithms work on various capture sources
+
+And, while you're using the GUI:
+- Display images to the GUI at intermediate points during processing, to see what each step in the algorithm is doing
+- Display arbitrary text ("tags") under images posted by vision modules
+- Dynamically tune vision module variables through the GUI with:
+    - automatically generated sliders for integer and floating point variables declared in vision modules
+    - automatically generated checkboxes for boolean variables declared in vision modules
+
 ## Installing OpenCV on your machine
 
 If JAVA_HOME is not set, set it with
@@ -32,7 +44,7 @@ Then run:
 $ ./install-opencv-unix.sh
 ```
 
-## Building with Ant
+## Building `stuyvision-lib` with Ant
 Make sure you have Apache Ant installed. You can check
 by running `ant -version`.
 
