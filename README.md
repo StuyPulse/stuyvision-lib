@@ -64,9 +64,13 @@ link.
 
 ## Configuring camera settings
 
-`setup-camera.sh` uses V4L (Video4Linux) to configure settings
-like exposure and brightness (which should be installed
-if you followed the OpenCV installation directions above).
+`setup-camera.sh` configures settings like exposure and brightness. It
+configures the camera at `/dev/video0` by default, but you can configure a
+different one with with `./setup-camera.sh -d N` (to use `/dev/video`**`N`**)
+or with `./setup-camera.sh -i` (to interactively choose a device).
+
+The script uses V4L (Video4Linux) to set the settings. V4L should be installed
+if you followed the OpenCV installation directions above.
 
 ## Setting up CV on a NVIDIA Jetson (Tegra)
 
