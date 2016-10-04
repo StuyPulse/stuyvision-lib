@@ -56,11 +56,20 @@ $ ant
 
 to build the project and create `dist/stuyvision.jar`.
 
-If javac canot find the `javafx` package,
-you may be using an OpenJDK that does not include JavaFX. The
-needed jar can be found at `<JRE_HOME>/lib/ext/jfxrt.jar` in
-an Oracle JDK. Copy this to `lib/jfxrt.jar` or make a symbolic
-link.
+If javac canot find the `javafx` package, you are likely using an old (pre
+version 8) version of the JDK. If JDK version 8 is not installed, install it.
+It may already be installed but not used by default, in which case run:
+
+```
+$ sudo update-alternatives --config java
+$ sudo update-alternatives --config javac
+```
+
+and select Java 8.
+
+If you for some reason cannot update to a JDK that has Java 8, get the JavaFX
+runtime from `lib/ext/jfxrt.jar` in the JRE folder of a machine that does have
+Java 8, and put it in `lib/jfxrt.jar` here.
 
 ## Configuring camera settings
 
@@ -95,24 +104,25 @@ We will show setup of runlevel 4, a runlevel open for customization in Debian
 and LSB (Linux Standard Base)-compliant distributions.
 
 What will run in runlevel 4 is determined by the contents of `/etc/rc4.d/`.
-`rc4.d` contains symbolic links to the scripts that will run when booting to
-this run level.
+This directory contains symbolic links to the scripts that will run when
+booting to this run level.
 
-Add a symbolic link to the script which will begin execution of your code.
-Give it a name beginning with `S`, followed by a two-digit number,
-and then a descriptive name. The two-digit number determines the order in
-which the scripts will run.
+Add a symbolic link to a script which will run your code.  Give it a name
+beginning with `S`, followed by a two-digit number, and then a descriptive
+name. The two-digit number determines the order in which the scripts will run.
 
 E.g.:
 
 ```
-cd /etc/rc4.d/
-sudo ln -s /path/to/script S80run-cv
+$ vim /path/to/script # Write all that scripty goodness
+$ cd /etc/rc4.d/
+$ sudo ln -s /path/to/script S80run-cv
 ```
 
-An example startup script can be seen [here](https://github.com/Team694/stuy-vision-2016/blob/master/run-cv.sh).
+An example startup script can be seen
+[here](https://github.com/Team694/stuy-vision-2016/blob/master/run-cv.sh).
 
-In order to set runlevel 4 as the default runlevel, open
+**In order to set runlevel 4 as the default runlevel**, open
 `/etc/init/rc-sysinit.conf`
 
 Find the line `env DEFAULT_RUNLEVEL=2`, and change it to
