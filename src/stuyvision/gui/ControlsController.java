@@ -63,6 +63,7 @@ public class ControlsController {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue,
                             Number newValue) {
+                        module.setRun(true);
                         int intValue = newValue.intValue();
                         finalIsv.set(intValue);
                         value.setText(Integer.toString(intValue));
@@ -94,6 +95,7 @@ public class ControlsController {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue,
                             Number newValue) {
+                        module.setRun(true);
                         double doubleValue = newValue.doubleValue();
                         finalDsv.set(doubleValue);
                         value.setText(formatter.format(doubleValue));
@@ -122,6 +124,7 @@ public class ControlsController {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
                             Boolean newValue) {
+                        module.setRun(true);
                         boolean booleanValue = newValue.booleanValue();
                         finalBv.setValue(booleanValue);
                     }

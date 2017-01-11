@@ -81,6 +81,9 @@ public class ModuleRunner {
                             } else {
                                 for (int i = 0; i < captureSourceMap.modules.length; i++) {
                                     VisionModule module = captureSourceMap.modules[i];
+                                    if (!module.shouldRun()) {
+                                        continue;
+                                    }
 
                                     // Unless this is the last module, clone the frame, so
                                     // that modules can mutate the frame they are given.
@@ -95,6 +98,7 @@ public class ModuleRunner {
                                             module.run(uniqueFrame);
                                             long duration = System.currentTimeMillis() - start;
                                             DebugPrinter.println(module.getName() + " ran in " + duration + " ms");
+                                            module.setRun(false);
                                         }
                                     }, module.getName() + " Thread");
                                     t.setDaemon(true);
