@@ -82,6 +82,7 @@ public class ModuleRunner {
                                 for (int i = 0; i < captureSourceMap.modules.length; i++) {
                                     VisionModule module = captureSourceMap.modules[i];
                                     if (!module.shouldRun()) {
+                                        frame.release();
                                         continue;
                                     }
 
