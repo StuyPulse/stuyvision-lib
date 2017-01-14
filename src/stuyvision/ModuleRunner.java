@@ -96,6 +96,7 @@ public class ModuleRunner {
                                         public void run() {
                                             long start = System.currentTimeMillis();
                                             module.run(uniqueFrame);
+                                            uniqueFrame.release();
                                             long duration = System.currentTimeMillis() - start;
                                             DebugPrinter.println(module.getName() + " ran in " + duration + " ms");
                                             module.setRun(false);
