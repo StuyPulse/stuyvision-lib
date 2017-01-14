@@ -6,6 +6,8 @@ import stuyvision.gui.VisionGui;
 
 public abstract class VisionModule {
 
+    private boolean shouldRun = true;
+
     // `app` remains null when the VisionModule instance will not
     // be used with the VisionGui GUI.
     private VisionGui app = null;
@@ -58,5 +60,13 @@ public abstract class VisionModule {
      */
     public boolean postTag(String imageLabel, String tagKey, String tagValue) {
         return app.postTag(imageLabel, tagKey, tagValue, this);
+    }
+
+    public boolean shouldRun() {
+        return this.shouldRun;
+    }
+
+    public void setRun(boolean shouldRun) {
+        this.shouldRun = shouldRun;
     }
 }

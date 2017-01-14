@@ -14,10 +14,10 @@
     <property name="build.dir" value="build" />
     <property name="dist.dir" value="dist" />
 
-    <property name="opencv_home" value="lib/opencv-3.0.0" />
+    <property name="opencv_home" value="lib/opencv-3.1.0" />
     <property name="opencv_lib" value="${opencv_home}/build/lib" />
 
-    <property name="opencv" value="${opencv_home}/build/bin/opencv-300.jar" />
+    <property name="opencv" value="${opencv_home}/build/bin/opencv-310.jar" />
     <property name="javafx" value="lib/jfxrt.jar" />
 
     <property name="camera" value="0" /> <!-- -Dcamera=X corresponds to /dev/videoX -->
