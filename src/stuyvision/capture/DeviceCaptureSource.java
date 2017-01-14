@@ -2,6 +2,7 @@ package stuyvision.capture;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
 
 public class DeviceCaptureSource extends CaptureSource {
 
@@ -34,5 +35,9 @@ public class DeviceCaptureSource extends CaptureSource {
 
     public void setBrightness(int value) {
         capture.set(10, value);
+    }
+
+    public void setBufferSize(int bufferSize){
+    	capture.set(Videoio.CV_CAP_PROP_BUFFERSIZE, bufferSize);
     }
 }
