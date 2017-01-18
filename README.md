@@ -142,7 +142,7 @@ a [more detailed one](https://docs.google.com/presentation/d/1ypONXF9mDQCF5lwWJm
 a [detailed walkthrough](https://docs.google.com/presentation/d/1-cAMxt7CmLMxYLiy3ehwWjKNabUQSgUoh-1C9Oaaq1g/edit?usp=sharing) with lots of code.
 Also, Team 254 gave
 [a presentation](https://www.team254.com/documents/vision-control/)
-on integrating computer vision with motion control.
+on integrating CV with motion control.
 
 - Official OpenCV 3.1.0 [JavaDocs](http://docs.opencv.org/java/3.1.0/).
 
