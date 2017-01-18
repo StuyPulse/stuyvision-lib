@@ -140,6 +140,9 @@ env DEFAULT_RUNLEVEL=4
 a [high-level talk](https://docs.google.com/a/stuypulse.com/presentation/d/1KvPWpPO9rFjTZ3nKJy4rmbvxRiOo2EwrciE0fggv8xM/edit?usp=sharing),
 a [more detailed one](https://docs.google.com/presentation/d/1ypONXF9mDQCF5lwWJmh5qIlvkGRBtAW8zupJt7juPxQ/edit?usp=sharing) with some code, and
 a [detailed walkthrough](https://docs.google.com/presentation/d/1-cAMxt7CmLMxYLiy3ehwWjKNabUQSgUoh-1C9Oaaq1g/edit?usp=sharing) with lots of code.
+Also, Team 254 gave
+[a presentation](https://www.team254.com/documents/vision-control/)
+on integrating computer vision with motion control.
 
 - Official OpenCV 3.1.0 [JavaDocs](http://docs.opencv.org/java/3.1.0/).
 
