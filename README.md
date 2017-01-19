@@ -81,6 +81,13 @@ or with `./setup-camera.sh -i` (to interactively choose a device).
 The script uses V4L (Video4Linux) to set the settings. V4L should be installed
 if you followed the OpenCV installation directions above.
 
+If you want to install V4L on the roboRIO, use `opkg`:
+
+```
+$ opkg update
+$ opkg install v4l-utils
+```
+
 ## Setting up CV on a NVIDIA Jetson ("Tegra")
 
 To install OpenCV 3.0, run:
