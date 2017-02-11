@@ -7,6 +7,7 @@ import org.opencv.core.Mat;
 
 import stuyvision.VisionModule;
 import stuyvision.capture.CaptureSource;
+import stuyvision.capture.DeviceCaptureSource;
 import stuyvision.capture.Loopable;
 import stuyvision.util.DebugPrinter;
 
@@ -81,7 +82,7 @@ public class ModuleRunner {
                             } else {
                                 for (int i = 0; i < captureSourceMap.modules.length; i++) {
                                     VisionModule module = captureSourceMap.modules[i];
-                                    if (!module.shouldRun()) {
+                                    if (!module.shouldRun() && !(captureSourceMap.captureSource instanceof DeviceCaptureSource)) {
                                         frame.release();
                                         continue;
                                     }
